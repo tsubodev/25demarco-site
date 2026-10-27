@@ -52,7 +52,7 @@
 	viewer.setBackground("skybox");
 
 	viewer.setDescription(
-		"Point cloud courtesy of <a target='_blank' href='https://www.sigeom.ch/'>sigeom sa</a>"
+		"Nuvem de pontos: 6716 - Cloud"
 	);
 
 	viewer.loadGUI(() => {
@@ -63,8 +63,8 @@
 	});
 
 	Potree.loadPointCloud(
-		"pointclouds/25%20de%20mar%C3%A7o/metadata.json",
-		"25 de março",
+		"pointclouds/6716-cloud/metadata.json",
+		"6716 - Cloud",
 		e => {
 
 			let scene = viewer.scene;
