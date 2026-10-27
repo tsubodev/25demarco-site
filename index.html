@@ -45,7 +45,7 @@
 
 		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 
-		viewer.setEDLEnabled(true);
+		viewer.setEDLEnabled(false);
 		viewer.setFOV(60);
 		viewer.setPointBudget(1_000_000);
 		viewer.setBackground("white");
@@ -59,7 +59,7 @@
 			viewer.scene.addPointCloud(e.pointcloud);
 
 			let material = e.pointcloud.material;
-			material.size = 0.01;
+			material.size = 0.25;
 			material.pointSizeType = Potree.PointSizeType.FIXED;
 			material.shape = Potree.PointShape.CIRCLE;
 			material.activeAttributeName = "rgba";
