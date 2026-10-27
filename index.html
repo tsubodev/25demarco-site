@@ -1,21 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-	<link rel="icon" href="data:,">
-	<meta charset="utf-8">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<title>25 de Março — Potree</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Conheça os puxadores e seus percursos pela região da 25 de Março.">
+  <link rel="icon" href="data:,">
+  <title>25 de Março — Percursos</title>
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/build/potree/potree.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/jquery-ui/jquery-ui.min.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/openlayers3/ol.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/spectrum/spectrum.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/jstree/themes/mixed/style.css">
+  <link rel="stylesheet" href="assets/interface.css">
 </head>
+<body class="menu-open">
+  <header class="site-header">
+    <h1 class="site-title">TÍTULO</h1>
+    <button class="menu-button" type="button" aria-expanded="true" aria-controls="start-menu">MENU <span aria-hidden="true">▾</span></button>
+  </header>
 
-<body>
+  <main class="workspace" id="workspace" inert>
+    <section class="viewer-frame" aria-label="Visualização interativa do percurso">
+      <div id="potree_render_area" class="potree_container"></div>
+      <p id="viewer-status" class="viewer-status" role="status">Selecione um puxador para conhecer seu percurso.</p>
+    </section>
+    <aside class="story-panel" aria-labelledby="person-heading">
+      <h2 id="person-heading" class="person-heading"><span>PUXADOR 1</span><span>NOME</span></h2>
+      <section class="route-section" aria-labelledby="route-heading">
+        <h3 id="route-heading">PERCURSO</h3>
+        <div class="media-placeholder route-placeholder"><span>Imagem do percurso</span></div>
+      </section>
+      <div class="story-columns">
+        <div class="photo-column" aria-label="Fotografias do percurso">
+          <div class="media-placeholder photo-placeholder"><span>Fotografia 01</span></div>
+          <div class="media-placeholder photo-placeholder"><span>Fotografia 02</span></div>
+          <div class="media-placeholder photo-placeholder"><span>Fotografia 03</span></div>
+          <div class="media-placeholder photo-placeholder"><span>Fotografia 04</span></div>
+        </div>
+        <div class="story-copy">
+          <p>Na região da 25 de Março, os percursos dos puxadores conectam pessoas, ruas e o cotidiano do comércio.</p>
+          <p>Explore a nuvem de pontos para conhecer um desses percursos.</p>
+          <p class="content-pending">Versão alpha: os quatro puxadores apresentam um percurso ilustrativo. Nomes, relatos, mapa e fotografias serão inseridos posteriormente.</p>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <section id="start-menu" class="start-screen" aria-label="Menu inicial">
+    <nav class="people-menu" aria-label="Escolha um puxador">
+      <button class="person-option" type="button" data-person="1" aria-current="true"><span>PUXADOR 1</span><span>NOME</span></button>
+      <button class="person-option" type="button" data-person="2"><span>PUXADOR 2</span><span>NOME</span></button>
+      <button class="person-option" type="button" data-person="3"><span>PUXADOR 3</span><span>NOME</span></button>
+      <button class="person-option" type="button" data-person="4"><span>PUXADOR 4</span><span>NOME</span></button>
+    </nav>
+    <footer class="credits">
+      <h2>integrantes do grupo:</h2>
+      <p>gabriel wissenbach<br>heloysa lobl<br>rachel haddad<br>pedro sales<br>yuri tsubouchi</p>
+    </footer>
+  </section>
 	<script src="vendor/potree-1.8.2/libs/jquery/jquery-3.1.1.min.js"></script>
 	<script src="vendor/potree-1.8.2/libs/spectrum/spectrum.js"></script>
 	<script src="vendor/potree-1.8.2/libs/jquery-ui/jquery-ui.min.js"></script>
@@ -31,44 +73,6 @@
 	<script src="vendor/potree-1.8.2/build/potree/potree.js"></script>
 	<script src="vendor/potree-1.8.2/libs/plasio/js/laslaz.js"></script>
 
-	<!-- INCLUDE ADDITIONAL DEPENDENCIES HERE -->
-	<!-- INCLUDE SETTINGS HERE -->
-
-	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
-		<div id="potree_render_area" style="background-image: url('vendor/potree-1.8.2/build/potree/resources/images/background.jpg');"></div>
-		<div id="potree_sidebar_container" hidden></div>
-	</div>
-
-	<script type="module">
-
-	import * as THREE from "./vendor/potree-1.8.2/libs/three.js/build/three.module.js";
-
-		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
-
-		viewer.setEDLEnabled(false);
-		viewer.setFOV(60);
-		viewer.setPointBudget(1_000_000);
-		viewer.setBackground("white");
-
-		viewer.setDescription("Nuvem de pontos — 6716");
-
-
-
-		// 6716: individual node files, compatible with ordinary static hosting.
-		Potree.loadPointCloud("pointclouds/6716-static-v2/cloud.js", "6716", function(e){
-			viewer.scene.addPointCloud(e.pointcloud);
-
-			let material = e.pointcloud.material;
-			material.size = 0.25;
-			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-			material.shape = Potree.PointShape.CIRCLE;
-			material.activeAttributeName = "rgba";
-
-			viewer.fitToScreen();
-		});
-
-	</script>
-
-
-  </body>
+  <script type="module" src="assets/interface.js"></script>
+</body>
 </html>
