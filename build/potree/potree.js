@@ -66314,6 +66314,48 @@ void main() {
 			this.url = url;
 		}
 
+		// Static hosts may ignore Range and return the complete file (HTTP 200).
+		// Share that download and slice it before passing data to the decoder.
+		async fetchRange(url, first, last){
+			this.rangeRequests = this.rangeRequests || new Map();
+			let pending = this.rangeRequests.get(url);
+			if(!pending){
+				pending = (async () => {
+					const response = await fetch(url, {
+						headers: {'Range': `bytes=${first}-${last}`},
+					});
+					if(response.status !== 200 && response.status !== 206){
+						throw new Error(`Failed to load ${url}: HTTP ${response.status}`);
+					}
+					return {buffer: await response.arrayBuffer(), status: response.status, first, last};
+				})();
+				this.rangeRequests.set(url, pending);
+			}
+			let result;
+			try{
+				result = await pending;
+			}catch(error){
+				this.rangeRequests.delete(url);
+				throw error;
+			}
+			if(result.status === 200){
+				if(last >= BigInt(result.buffer.byteLength)){
+					throw new Error(`Incomplete point-cloud file: ${url}`);
+				}
+				return result.buffer.slice(Number(first), Number(last + 1n));
+			}
+			if(this.rangeRequests.get(url) === pending){
+				this.rangeRequests.delete(url);
+			}
+			if(result.first !== first || result.last !== last){
+				return this.fetchRange(url, first, last);
+			}
+			if(BigInt(result.buffer.byteLength) !== last - first + 1n){
+				throw new Error(`Invalid point-cloud byte range: ${url}`);
+			}
+			return result.buffer;
+		}
+
 		async load(node){
 
 			if(node.loaded || node.loading){
@@ -66349,14 +66391,7 @@ void main() {
 					buffer = new ArrayBuffer(0);
 					console.warn(`loaded node with 0 bytes: ${node.name}`);
 				}else {
-					let response = await fetch(urlOctree, {
-						headers: {
-							'content-type': 'multipart/byteranges',
-							'Range': `bytes=${first}-${last}`,
-						},
-					});
-
-					buffer = await response.arrayBuffer();
+					buffer = await this.fetchRange(urlOctree, first, last);
 				}
 
 				let workerPath;
@@ -66553,16 +66588,7 @@ void main() {
 			let first = hierarchyByteOffset;
 			let last = first + hierarchyByteSize - 1n;
 
-			let response = await fetch(hierarchyPath, {
-				headers: {
-					'content-type': 'multipart/byteranges',
-					'Range': `bytes=${first}-${last}`,
-				},
-			});
-
-
-
-			let buffer = await response.arrayBuffer();
+			let buffer = await this.fetchRange(hierarchyPath, first, last);
 
 			this.parseHierarchy(node, buffer);
 
