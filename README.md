@@ -2,7 +2,7 @@
 
 Instalação estática do [Potree oficial](https://github.com/potree/potree), tag `1.8.2`, commit `3013577379b5c8530ebca3cdc980f7585ae2320f`.
 
-`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` deriva de `examples/lion.html`; a nuvem inicial é a demonstração oficial `lion_takanawa`. As nuvens `25 de março` e `6716-cloud` permanecem em `pointclouds/`, sem serem carregadas nesta base limpa.
+`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` deriva de `examples/lion.html`; a nuvem inicial é `6716-static`, preparada a partir do arquivo original `6716-cloud`. A nuvem `25 de março` e a demonstração oficial `lion_takanawa` também permanecem preservadas em `pointclouds/`.
 
 ## Executar
 
@@ -12,7 +12,7 @@ Na raiz do repositório:
 python3 -m http.server 8000
 ```
 
-A demonstração Lion usa arquivos individuais, sem precisar de suporte HTTP Range. As nuvens no formato Potree 2.0 precisam de um servidor compatível com Range.
+A nuvem 6716 usa arquivos individuais, sem precisar de suporte HTTP Range. Para regenerar a cópia de exibição, execute `python3 tools/prepare-6716.py`. O script preserva os 211.969 pontos, exporta posições e RGB e verifica a contagem e o erro máximo de posição (0,00000005 unidade). Os atributos originais permanecem intactos em `6716-cloud`. As nuvens no formato Potree 2.0 precisam de um servidor compatível com Range.
 
 ## Reproduzir os arquivos oficiais
 

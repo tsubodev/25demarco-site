@@ -50,7 +50,7 @@
 		viewer.setPointBudget(1_000_000);
 		viewer.setBackground("gradient");
 
-		viewer.setDescription("Demonstração oficial do Potree — Lion Takanawa");
+		viewer.setDescription("Nuvem de pontos — 6716");
 
 		viewer.loadGUI(() => {
 			viewer.setLanguage('en');
@@ -58,13 +58,14 @@
 			//viewer.toggleSidebar();
 		});
 
-		// Lion
-		Potree.loadPointCloud("pointclouds/lion_takanawa/cloud.js", "lion", function(e){
+		// 6716: individual node files, compatible with ordinary static hosting.
+		Potree.loadPointCloud("pointclouds/6716-static/cloud.js", "6716", function(e){
 			viewer.scene.addPointCloud(e.pointcloud);
 
 			let material = e.pointcloud.material;
 			material.size = 1;
 			material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+			material.activeAttributeName = "rgba";
 
 			viewer.fitToScreen();
 		});
