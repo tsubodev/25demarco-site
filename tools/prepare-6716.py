@@ -10,7 +10,7 @@ import struct
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'pointclouds/6716-cloud'
-TARGET = ROOT / 'pointclouds/6716-static'
+TARGET = ROOT / 'pointclouds/6716-static-v2'
 SCALE = 1e-7
 
 

@@ -36,7 +36,7 @@
 
 	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
 		<div id="potree_render_area" style="background-image: url('vendor/potree-1.8.2/build/potree/resources/images/background.jpg');"></div>
-		<div id="potree_sidebar_container"> </div>
+		<div id="potree_sidebar_container" hidden></div>
 	</div>
 
 	<script type="module">
@@ -48,18 +48,14 @@
 		viewer.setEDLEnabled(true);
 		viewer.setFOV(60);
 		viewer.setPointBudget(1_000_000);
-		viewer.setBackground("gradient");
+		viewer.setBackground("white");
 
 		viewer.setDescription("Nuvem de pontos — 6716");
 
-		viewer.loadGUI(() => {
-			viewer.setLanguage('en');
-			$("#menu_appearance").next().show();
-			//viewer.toggleSidebar();
-		});
+
 
 		// 6716: individual node files, compatible with ordinary static hosting.
-		Potree.loadPointCloud("pointclouds/6716-static/cloud.js", "6716", function(e){
+		Potree.loadPointCloud("pointclouds/6716-static-v2/cloud.js", "6716", function(e){
 			viewer.scene.addPointCloud(e.pointcloud);
 
 			let material = e.pointcloud.material;
