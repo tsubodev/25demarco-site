@@ -14,7 +14,7 @@ args.screenshots.mkdir(parents=True, exist_ok=True)
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path=which('chromium') or which('google-chrome'),args=['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
  for width,height in ((1450,1024),(390,844),(375,667)):
-  page=b.new_page(viewport={'width':width,'height':height});errors=[];failed=[]
+  page=b.new_page(viewport={'width':width,'height':height},is_mobile=width<600,has_touch=width<600);errors=[];failed=[]
   page.on('pageerror',lambda e:errors.append(str(e)))
   page.on('response',lambda r:failed.append((r.status,r.url)) if r.status>=400 else None)
   page.goto(args.url)
@@ -34,6 +34,26 @@ with sync_playwright() as p:
   rect=page.locator('.viewer-frame').bounding_box();canvas=page.locator('#potree_render_area canvas').first.bounding_box()
   assert abs(rect['width']-canvas['width'])<3 and abs(rect['height']-canvas['height'])<3,(rect,canvas)
   page.screenshot(path=str(args.screenshots / f'pointcloud-ui-{width}.png'),full_page=True)
+  if width < 600:
+   # Use a real browser touch gesture: screenshots and scrollTo cannot detect
+   # overflow:hidden blocking user scrolling (the original regression).
+   session=page.context.new_cdp_session(page)
+   story=page.locator('.story-panel').bounding_box()
+   start_y=min(story['y']+100,height-40)
+   def swipe_up(y):
+    session.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':width//2,'y':y}]})
+    for step in range(1,7):
+     session.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':width//2,'y':y-step*50}]})
+     page.wait_for_timeout(60)
+    session.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+   swipe_up(start_y)
+   page.wait_for_function('window.scrollY > 0',timeout=3000)
+   for _ in range(3):
+    swipe_up(height-80)
+   page.wait_for_function('document.querySelector(".photo-column").lastElementChild.getBoundingClientRect().bottom <= innerHeight + 2')
+   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+   print('PASS: touch scrolling reaches final photograph',width,flush=True)
+   session.detach()
   page.locator('.menu-button').click()
   assert page.locator('#start-menu').is_visible()
   page.locator('[data-person="4"]').click()

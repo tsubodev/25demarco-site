@@ -9,7 +9,9 @@
   background: var(--purple);
 }
 * { box-sizing: border-box; }
-body { margin: 0; }
+/* Override the full-screen body lock in Potree's vendor stylesheet.
+   Only the opening menu locks page scrolling; the mobile story flows normally. */
+body { margin: 0; position: relative; width: 100%; height: auto; min-height: 100dvh; overflow-x: hidden; overflow-y: auto; }
 button { color: inherit; font: inherit; cursor: pointer; }
 button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 7px; }
 [hidden] { display: none !important; }
