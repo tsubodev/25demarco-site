@@ -24,7 +24,7 @@ No GitHub Pages, a origem deve ser a branch `main`, pasta `/ (root)`. `.nojekyll
 
 ## Interface alpha
 
-O site inicia em **START MENU**, conforme as referências visuais. As quatro opções de puxador são ilustrativas: todas abrem a mesma nuvem 6716, sem associá-la a uma pessoa real. O botão MENU permite retornar à seleção; Escape alterna o menu depois que o percurso é aberto. O Potree é inicializado apenas ao entrar no percurso.
+O site inicia em **START MENU**, conforme as referências visuais. A opção **PUXADOR 1** abre a nuvem 6716 e **PUXADOR 2** abre a 6718. As opções PUXADOR 3 e 4 mostram um aviso de percurso ainda não disponível. Cada página carrega apenas seu próprio point cloud; ao trocar de página, apenas a nuvem selecionada fica visível. Os nomes pessoais continuam provisórios. O botão MENU permite retornar à seleção; Escape alterna o menu depois que o percurso é aberto. O Potree é inicializado apenas ao entrar no percurso.
 
 O layout usa roxo, amarelo-claro, títulos em itálico e degradê na abertura. A área do Potree mantém fundo branco, Eye-Dome Lighting desligado, tamanho 0.25, sizing ADAPTIVE e shape CIRCLE. A coluna lateral tem espaços identificados para o mapa e quatro fotografias. Título, nomes e conteúdo definitivo ainda são provisórios. Os créditos seguem a referência fornecida. O menu nativo do Potree permanece desativado.
 
@@ -36,4 +36,25 @@ Para verificar a navegação, as configurações da nuvem e os tamanhos de tela 
 python3 tools/check-interface.py --url http://127.0.0.1:8000/
 ```
 
-O teste também verifica a ausência de erros HTTP/JavaScript, o retorno ao menu e a seleção das quatro opções sem duplicar nuvens. Capturas de tela ficam em `/tmp/25demarco-ui-check/`.
+O teste também verifica a ausência de erros HTTP/JavaScript, o retorno ao menu e a associação da nuvem ao PUXADOR 1 e a navegação sem duplicar nuvens. Capturas de tela ficam em `/tmp/25demarco-ui-check/`.
+
+## Cadastro de point clouds por puxador
+
+As páginas são independentes e o vínculo fica em `assets/point-clouds.js`:
+
+| Página do menu | Point cloud |
+| --- | --- |
+| PUXADOR 1 | 6716 (disponível) |
+| PUXADOR 2 | 6718 (disponível) |
+| PUXADOR 3 | 6719 — aguardando recebimento do arquivo em partes |
+| PUXADOR 4 | Reservado para um novo arquivo |
+
+Uma entrada `null` exibe “O percurso deste puxador será adicionado em breve” e não carrega a nuvem de outro puxador. Ao receber um novo dataset, prepare seus arquivos em uma pasta própria e preencha o cadastro da página correspondente com `url` e `name`. Preserve os arquivos das outras páginas.
+
+Para preparar novos datasets no mesmo formato estático, preservando os originais:
+
+```sh
+python3 tools/prepare_point_cloud.py pointclouds/6718-cloud pointclouds/6718-static
+```
+
+A nuvem 6718 contém 490.330 pontos. As configurações ADAPTIVE, CIRCLE, 0.25, fundo branco e EDL desligado se aplicam a todos os percursos. As nuvens são carregadas sob demanda e mantidas em cache; retornar a uma página não duplica seu point cloud. O enquadramento usa apenas o percurso selecionado.

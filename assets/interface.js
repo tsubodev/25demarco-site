@@ -1,3 +1,5 @@
+import { pointClouds as routes } from './point-clouds.js';
+
 const menuButton = document.querySelector('.menu-button');
 const startMenu = document.querySelector('#start-menu');
 const workspace = document.querySelector('#workspace');
@@ -17,7 +19,52 @@ interactionButton.addEventListener('click', () => {
 });
 
 let viewer;
-let loading;
+let viewerReady;
+let three;
+let selectedPerson = '1';
+let hasEntered = false;
+const clouds = new Map();
+
+function renderRoute() {
+  const available = Boolean(routes[selectedPerson]);
+  const record = clouds.get(selectedPerson);
+  const loaded = Boolean(record?.pointcloud);
+  viewerFrame.classList.toggle('route-pending', !available);
+  for (const [person, entry] of clouds) {
+    if (entry.pointcloud) entry.pointcloud.visible = person === selectedPerson;
+  }
+  interactionButton.hidden = !loaded;
+  status.hidden = loaded;
+  status.textContent = !available
+    ? 'O percurso deste puxador será adicionado em breve.'
+    : record?.error
+      ? 'Não foi possível carregar o percurso. Atualize a página para tentar novamente.'
+      : 'Carregando o percurso…';
+}
+
+function frameCloud(pointcloud) {
+  // Frame just this route, rather than the bounding boxes of cached hidden clouds.
+  const frame = new three.Object3D();
+  frame.boundingBox = viewer.getBoundingBox([pointcloud]);
+  viewer.zoomTo(frame, 1);
+  viewer.controls.stop();
+}
+
+function openExperience(person) {
+  selectedPerson = person;
+  hasEntered = true;
+  people.forEach(button => {
+    if (button.dataset.person === person) button.setAttribute('aria-current', 'true');
+    else button.removeAttribute('aria-current');
+  });
+  document.querySelector('#person-heading span').textContent = `PUXADOR ${person}`;
+  setInteraction(false);
+  renderRoute();
+  setMenu(false);
+  const cloud = clouds.get(person)?.pointcloud;
+  if (cloud) frameCloud(cloud);
+  else if (routes[person]) loadViewer(person);
+}
 
 function setMenu(open) {
   if (open) setInteraction(false);
@@ -31,60 +78,68 @@ function setMenu(open) {
   window.dispatchEvent(new Event('resize'));
 }
 
-async function loadViewer() {
-  if (loading) return loading;
-  loading = (async () => {
-    status.hidden = false;
-    status.textContent = 'Carregando o percurso…';
-    try {
-      // Import only when entering the experience; no WebGL work behind the start screen.
-      await import('../vendor/potree-1.8.2/libs/three.js/build/three.module.js');
+async function ensureViewer() {
+  if (!viewerReady) {
+    viewerReady = (async () => {
+      // One viewer for all pages; create it only after a configured route is selected.
+      three = await import('../vendor/potree-1.8.2/libs/three.js/build/three.module.js');
       viewer = window.viewer = new Potree.Viewer(document.querySelector('#potree_render_area'));
       viewer.setEDLEnabled(false);
       viewer.setFOV(60);
       viewer.setPointBudget(1_000_000);
       viewer.setBackground('white');
       viewer.setDescription('');
+    })();
+  }
+  return viewerReady;
+}
 
-      // Validate the entry file so a missing deployment gives an actionable message.
-      const response = await fetch('pointclouds/6716-static-v2/cloud.js');
+async function loadViewer(person) {
+  if (clouds.has(person)) return clouds.get(person).promise;
+  const route = routes[person];
+  const record = {};
+  clouds.set(person, record);
+  record.promise = (async () => {
+    renderRoute();
+    try {
+      await ensureViewer();
+      const response = await fetch(route.url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       let timeout;
       const { pointcloud } = await Promise.race([
-        Potree.loadPointCloud('pointclouds/6716-static-v2/cloud.js', '6716'),
+        Potree.loadPointCloud(route.url, route.name),
         new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Tempo de carregamento excedido')), 45000); }),
       ]).finally(() => clearTimeout(timeout));
-      pointcloud.name = '6716';
+      pointcloud.name = route.name;
       const material = pointcloud.material;
       material.size = 0.25;
       material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
       material.shape = Potree.PointShape.CIRCLE;
       material.activeAttributeName = 'rgba';
+      pointcloud.visible = false;
+      record.pointcloud = pointcloud;
       viewer.scene.addPointCloud(pointcloud);
-      viewer.fitToScreen();
-      status.hidden = true;
+      renderRoute();
+      // A previous download completing must not replace the current page's camera.
+      if (selectedPerson === person) frameCloud(pointcloud);
     } catch (error) {
-      console.error('Não foi possível carregar o percurso:', error);
-      status.textContent = 'Não foi possível carregar o percurso. Atualize a página para tentar novamente.';
+      console.error(`Não foi possível carregar o percurso ${person}:`, error);
+      record.error = true;
+      renderRoute();
     }
   })();
-  return loading;
+  return record.promise;
 }
 
 people.forEach(button => button.addEventListener('click', () => {
-  people.forEach(person => person.removeAttribute('aria-current'));
-  button.setAttribute('aria-current', 'true');
-  document.querySelector('#person-heading span').textContent = `PUXADOR ${button.dataset.person}`;
-  setMenu(false);
-  loadViewer();
+  openExperience(button.dataset.person);
 }));
 menuButton.addEventListener('click', () => {
-  const isOpen = !startMenu.hidden;
-  if (isOpen && !viewer) {
-    setMenu(false);
-    loadViewer();
-  } else setMenu(!isOpen);
+  if (startMenu.hidden) setMenu(true);
+  else openExperience(selectedPerson);
 });
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && viewer) setMenu(startMenu.hidden);
+  if (event.key !== 'Escape' || !hasEntered) return;
+  if (startMenu.hidden) setMenu(true);
+  else openExperience(selectedPerson);
 });

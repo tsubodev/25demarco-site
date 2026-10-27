@@ -71,6 +71,25 @@ with sync_playwright() as p:
   page.locator('[data-person="4"]').click()
   assert page.locator('#person-heading').inner_text().startswith('PUXADOR 4')
   assert page.evaluate('viewer.scene.pointclouds.length')==1
+  assert page.evaluate('viewer.scene.pointclouds[0].visible') is False
+  assert page.locator('#viewer-status').is_visible()
+  assert 'adicionado em breve' in page.locator('#viewer-status').inner_text()
+  assert page.locator('#viewer-interaction').is_hidden()
+  page.locator('.menu-button').click()
+  page.locator('[data-person="1"]').click()
+  page.wait_for_function('viewer.scene.pointclouds[0].visible && viewer.scene.pointclouds[0].numVisiblePoints > 0')
+  assert page.locator('#viewer-status').is_hidden()
+  for person, name in (('2','6718'),('1','6716'),('2','6718'),('1','6716')):
+   page.locator('.menu-button').click()
+   page.locator(f'[data-person="{person}"]').click()
+   page.wait_for_function('(name) => viewer.scene.pointclouds.some(c => c.name === name && c.visible && c.numVisiblePoints > 0)',arg=name,timeout=45000)
+   visible=page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).map(c=>c.name)')
+   assert visible==[name],visible
+   assert page.evaluate('viewer.scene.pointclouds.length')==2
+   assert page.locator('#viewer-status').is_hidden()
+   route_settings=page.evaluate('''() => {const m=viewer.scene.pointclouds.find(c=>c.visible).material;return {size:m.size,adaptive:m.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:m.shape===Potree.PointShape.CIRCLE}}''')
+   assert route_settings==dict(size=.25,adaptive=True,circle=True),route_settings
+  print('PASS: pages 1 and 2 show only their assigned cloud, without duplicate loads',width,flush=True)
   page.keyboard.press('Escape');assert page.locator('#start-menu').is_visible()
   page.keyboard.press('Escape');assert not page.locator('#start-menu').is_visible()
   assert not errors and not failed,(errors,failed)
