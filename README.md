@@ -28,7 +28,7 @@ O site inicia em **START MENU**, conforme as referências visuais. As quatro op�
 
 O layout usa roxo, amarelo-claro, títulos em itálico e degradê na abertura. A área do Potree mantém fundo branco, Eye-Dome Lighting desligado, tamanho 0.25, sizing ADAPTIVE e shape CIRCLE. A coluna lateral tem espaços identificados para o mapa e quatro fotografias. Título, nomes e conteúdo definitivo ainda são provisórios. Os créditos seguem a referência fornecida. O menu nativo do Potree permanece desativado.
 
-Em telas maiores, a coluna de informações rola independentemente do visualizador. No celular, os painéis ficam empilhados. Substitua os espaços de imagem por arquivos com textos alternativos quando os materiais separados estiverem disponíveis.
+Em telas maiores, a coluna de informações rola independentemente do visualizador. No celular, os painéis ficam empilhados. Inicialmente, deslizar sobre a nuvem rola a página. O botão **EXPLORAR NUVEM** ativa os gestos 3D; **VOLTAR À ROLAGEM** libera novamente a página. Substitua os espaços de imagem por arquivos com textos alternativos quando os materiais separados estiverem disponíveis.
 
 Para verificar a navegação, as configurações da nuvem e os tamanhos de tela (1450, 390 e 375 px), com Playwright e Chromium disponíveis:
 

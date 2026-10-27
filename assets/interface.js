@@ -4,10 +4,23 @@ const workspace = document.querySelector('#workspace');
 const people = [...document.querySelectorAll('[data-person]')];
 const firstPerson = people[0];
 const status = document.querySelector('#viewer-status');
+const interactionButton = document.querySelector('#viewer-interaction');
+const viewerFrame = document.querySelector('.viewer-frame');
+
+function setInteraction(active) {
+  viewerFrame.classList.toggle('is-interacting', active);
+  interactionButton.setAttribute('aria-pressed', String(active));
+  interactionButton.textContent = active ? 'VOLTAR À ROLAGEM' : 'EXPLORAR NUVEM';
+}
+interactionButton.addEventListener('click', () => {
+  setInteraction(interactionButton.getAttribute('aria-pressed') !== 'true');
+});
+
 let viewer;
 let loading;
 
 function setMenu(open) {
+  if (open) setInteraction(false);
   document.body.classList.toggle('menu-open', open);
   startMenu.hidden = !open;
   workspace.inert = open;

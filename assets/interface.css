@@ -24,6 +24,7 @@ button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 7px; }
 #potree_render_area { position: absolute; inset: 0; width: 100%; height: 100%; background: white; }
 #potree_render_area:empty { background: var(--yellow); }
 .viewer-status { position: absolute; z-index: 2; top: 20px; left: 24px; right: 24px; color: var(--purple); font-size: 14px; line-height: 1.5; pointer-events: none; }
+.viewer-interaction { display: none; }
 .story-panel { min-width: 0; overflow-y: auto; scrollbar-width: thin; padding: 0 3px 32px 0; }
 .person-heading { text-align: right; font-size: clamp(25px, 2vw, 38px); line-height: 1.15; font-weight: 400; font-style: italic; margin: -4px 0 0; }
 .person-heading span, .person-option span { display: block; }
@@ -64,6 +65,11 @@ button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 7px; }
   .site-title { font-size: 38px; }
   .menu-button { font-size: 18px; padding-top: 7px; }
   .workspace { height: auto; min-height: 0; display: flex; flex-direction: column; padding: 0 22px 32px; gap: 35px; }
+  /* Let native page scrolling win until the visitor opts into 3D gestures. */
+  .viewer-frame:not(.is-interacting) #potree_render_area { pointer-events: none; }
+  .viewer-frame:not(.is-interacting) { touch-action: pan-y; }
+  .viewer-frame.is-interacting #potree_render_area { touch-action: none; }
+  .viewer-interaction { display: block; position: absolute; top: 12px; right: 12px; z-index: 3; max-width: calc(100% - 24px); padding: 10px 12px; border: 1px solid #2b244b50; background: #fffffff0; color: var(--purple); font-size: 11px; letter-spacing: .04em; }
   .viewer-frame { height: 54dvh; min-height: 320px; margin-top: 25px; flex: none; box-shadow: 6px -6px 15px 2px #efefa355; }
   .story-panel { overflow: visible; padding: 0; }
   .person-heading { margin: 0 0 22px; }

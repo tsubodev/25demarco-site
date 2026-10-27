@@ -38,14 +38,26 @@ with sync_playwright() as p:
    # Use a real browser touch gesture: screenshots and scrollTo cannot detect
    # overflow:hidden blocking user scrolling (the original regression).
    session=page.context.new_cdp_session(page)
-   story=page.locator('.story-panel').bounding_box()
-   start_y=min(story['y']+100,height-40)
+   start_y=min(canvas['y']+canvas['height']-35,height-140)
    def swipe_up(y):
     session.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':width//2,'y':y}]})
     for step in range(1,7):
      session.send('Input.dispatchTouchEvent',{'type':'touchMove','touchPoints':[{'x':width//2,'y':y-step*50}]})
      page.wait_for_timeout(60)
     session.send('Input.dispatchTouchEvent',{'type':'touchEnd','touchPoints':[]})
+   swipe_up(start_y)
+   page.wait_for_function('window.scrollY > 0',timeout=3000)
+   print('PASS: portrait swipe over cloud scrolls page',width,flush=True)
+   page.evaluate('window.scrollTo(0,0)')
+   page.wait_for_function('window.scrollY === 0')
+   page.locator('#viewer-interaction').tap()
+   assert page.locator('#viewer-interaction').get_attribute('aria-pressed')=='true'
+   pitch=page.evaluate('viewer.scene.view.pitch')
+   swipe_up(start_y)
+   assert page.evaluate('window.scrollY')==0, '3D mode should retain gestures inside viewer'
+   assert page.evaluate('viewer.scene.view.pitch') != pitch, '3D touch gesture did not move camera'
+   page.locator('#viewer-interaction').tap()
+   assert page.locator('#viewer-interaction').get_attribute('aria-pressed')=='false'
    swipe_up(start_y)
    page.wait_for_function('window.scrollY > 0',timeout=3000)
    for _ in range(3):
