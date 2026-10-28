@@ -7,6 +7,7 @@ from collections import deque
 import json
 from pathlib import Path
 import struct
+from zipfile import ZipFile
 
 
 
@@ -15,7 +16,13 @@ def prepare(source, target, scale=1e-7):
     metadata = json.loads((source / 'metadata.json').read_text())
     assert metadata['version'] == '2.0' and metadata['encoding'] == 'DEFAULT'
     hierarchy = (source / 'hierarchy.bin').read_bytes()
-    octree = (source / 'octree.bin').read_bytes()
+    octree_file = source / 'octree.bin'
+    if octree_file.exists():
+        octree = octree_file.read_bytes()
+    else:
+        # Keep large uploaded archives compressed in Git; extract only in memory.
+        with ZipFile(source / 'octree.zip') as archive:
+            octree = archive.read('octree.bin')
     attributes = metadata['attributes']
     stride = sum(a['size'] for a in attributes)
     assert attributes[0]['name'] == 'position' and attributes[0]['type'] == 'int32'

@@ -24,7 +24,7 @@ No GitHub Pages, a origem deve ser a branch `main`, pasta `/ (root)`. `.nojekyll
 
 ## Interface alpha
 
-O site inicia em **START MENU**, conforme as referências visuais. A opção **PUXADOR 1** abre a nuvem 6716 e **PUXADOR 2** abre a 6718. As opções PUXADOR 3 e 4 mostram um aviso de percurso ainda não disponível. Cada página carrega apenas seu próprio point cloud; ao trocar de página, apenas a nuvem selecionada fica visível. Os nomes pessoais continuam provisórios. O botão MENU permite retornar à seleção; Escape alterna o menu depois que o percurso é aberto. O Potree é inicializado apenas ao entrar no percurso.
+O site inicia em **START MENU**, conforme as referências visuais. A opção **PUXADOR 1** abre a nuvem 6716, **PUXADOR 2** abre a 6718 e **PUXADOR 3** reúne os 12 trechos da 6719 no mesmo visualizador. PUXADOR 4 mostra um aviso de percurso ainda não disponível. Cada página carrega apenas seu próprio conjunto; ao trocar de página, apenas os trechos do percurso selecionado ficam visíveis. Os nomes pessoais continuam provisórios. O botão MENU permite retornar à seleção; Escape alterna o menu depois que o percurso é aberto. O Potree é inicializado apenas ao entrar no percurso.
 
 O layout usa roxo, amarelo-claro, títulos em itálico e degradê na abertura. A área do Potree mantém fundo branco, Eye-Dome Lighting desligado, tamanho 0.25, sizing ADAPTIVE e shape CIRCLE. A coluna lateral tem espaços identificados para o mapa e quatro fotografias. Título, nomes e conteúdo definitivo ainda são provisórios. Os créditos seguem a referência fornecida. O menu nativo do Potree permanece desativado.
 
@@ -46,7 +46,7 @@ As páginas são independentes e o vínculo fica em `assets/point-clouds.js`:
 | --- | --- |
 | PUXADOR 1 | 6716 (disponível) |
 | PUXADOR 2 | 6718 (disponível) |
-| PUXADOR 3 | 6719 — aguardando recebimento do arquivo em partes |
+| PUXADOR 3 | 6719 — 12 trechos alinhados (disponível) |
 | PUXADOR 4 | Reservado para um novo arquivo |
 
 Uma entrada `null` exibe “O percurso deste puxador será adicionado em breve” e não carrega a nuvem de outro puxador. Ao receber um novo dataset, prepare seus arquivos em uma pasta própria e preencha o cadastro da página correspondente com `url` e `name`. Preserve os arquivos das outras páginas.
@@ -58,3 +58,18 @@ python3 tools/prepare_point_cloud.py pointclouds/6718-cloud pointclouds/6718-sta
 ```
 
 A nuvem 6718 contém 490.330 pontos. As configurações ADAPTIVE, CIRCLE, 0.25, fundo branco e EDL desligado se aplicam a todos os percursos. As nuvens são carregadas sob demanda e mantidas em cache; retornar a uma página não duplica seu point cloud. O enquadramento usa apenas o percurso selecionado.
+
+## Conjunto 6719
+
+Os 12 diretórios recebidos foram movidos de `6719/` para `pointclouds/6719/original/`, sem editar seu conteúdo. A cópia para exibição fica em `pointclouds/6719/static/`; são **11.321.028 pontos** no total.
+
+Todos os trechos são carregados juntos no PUXADOR 3, em um único visualizador Potree. As coordenadas e os offsets de origem de cada trecho são preservados; não há translação dos point clouds para zero, troca de eixos ou mudança de escala. O enquadramento existente considera o conjunto selecionado, sem alterar a origem dos dados.
+
+Para reproduzir os arquivos de exibição:
+
+```sh
+python3 tools/prepare-6719.py
+python3 tools/check-6719.py --url http://127.0.0.1:8000/
+```
+
+`project42_converted` fornece `octree.zip`. O preparador lê `octree.bin` de dentro desse ZIP em memória, preservando o arquivo original compactado no Git. Os atributos completos permanecem nos originais; a exibição exporta posições e RGB, com erro de quantização limitado a 0,00000005 unidade. A validação confere as posições dos 12 objetos Potree contra as origens recebidas, a renderização conjunta e a troca de páginas sem duplicar trechos.
