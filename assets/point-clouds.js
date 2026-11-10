@@ -59,6 +59,7 @@ export const pointClouds = {
   },
   '4': {
   "name": "6735",
+  "trajectory": "./6735-trajectory.json",
   "sources": [
     {
       "url": "pointclouds/6735/static/6735.1 - Cloud_converted/cloud.js",

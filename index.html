@@ -27,6 +27,19 @@
     </section>
     <aside class="story-panel" aria-labelledby="person-heading">
       <h2 id="person-heading" class="person-heading"><span>PUXADOR 1</span><span>NOME</span></h2>
+      <section id="guided-route" class="guided-route" aria-label="Visita guiada do Puxador 4" hidden>
+        <h3>VISITA GUIADA</h3>
+        <label><input id="tour-path" type="checkbox" checked disabled> MOSTRAR TRAJETÓRIA</label>
+        <div class="tour-buttons">
+          <button id="tour-play" type="button" disabled>INICIAR VISITA</button>
+          <button id="tour-pause" type="button" disabled>PAUSAR</button>
+          <button id="tour-restart" type="button" disabled>REINICIAR</button>
+          <button id="tour-exit" type="button" disabled>EXPLORAÇÃO LIVRE</button>
+          <button id="tour-overview" type="button">VISTA GERAL</button>
+        </div>
+        <progress id="tour-progress" max="1" value="0" aria-label="Progresso da visita"></progress>
+        <p id="tour-status" role="status">Carregando percurso…</p>
+      </section>
       <section class="route-section" aria-labelledby="route-heading">
         <h3 id="route-heading">PERCURSO</h3>
         <div class="media-placeholder route-placeholder"><span>Imagem do percurso</span></div>

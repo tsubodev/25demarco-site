@@ -88,3 +88,24 @@ python3 tools/check-6735.py --url http://127.0.0.1:8000/
 ```
 
 O preparador verifica todos os pontos e limita o erro de quantização a 0,00000005 unidade. A cópia estática exporta posições e RGB; os atributos completos permanecem nos originais. O teste verifica as 17 origens, a renderização e a troca de percursos sem duplicação.
+
+## Trajetória e visita guiada — PUXADOR 4
+
+`pointclouds/6735/6735 cam.xml` contém 240 câmeras alinhadas do sensor esférico, em um único chunk/componente, com referência `Local Coordinates (m)`. Os nomes `VÍDEO_6735000` a `VÍDEO_6735239` definem a ordem numérica; não há tempos de captura. As matrizes são poses câmera → chunk; seus centros são a última coluna. Não há transformação adicional de chunk/componente. A rotação `region/R` descreve a caixa de recorte, não deve ser aplicada às câmeras.
+
+O mapeamento utilizado para a nuvem existente é identidade: os centros permanecem no referencial local recebido, sem subtrair offsets, recentralizar ou trocar eixos. Os 240 centros estão dentro dos limites dos trechos da 6735. Uma comparação com uma amostra de 1/20 dos pontos originais encontrou distância mediana de 2,37 m e máxima de 4,55 m entre câmeras e superfícies. Isso é evidência de compatibilidade espacial, não substitui uma conferência independente no projeto Metashape; os metadados Potree não declaram projeção nem documentam eventuais transformações externas.
+
+Para reproduzir e validar:
+
+```sh
+python3 tools/prepare-6735-trajectory.py
+python3 tools/check-6735-trajectory.py --url http://127.0.0.1:8000/
+# Opcional: também reproduzir a visita desktop inteira em tempo real.
+python3 tools/check-6735-trajectory.py --url http://127.0.0.1:8000/ --full-playback
+```
+
+O JSON `assets/6735-trajectory.json` preserva os centros sem suavização, identifica o hash do XML, as unidades, a matriz identidade e os tempos ausentes (`null`). O preparador rejeita frames ausentes, centros consecutivos repetidos e saltos acima de 5 m ou cinco vezes a mediana, exigindo revisão antes de ligar possíveis sessões. Neste XML o maior passo é 2,18 m; o caminho mede cerca de 270,13 m.
+
+A linha de 3 pixels usa o Line2 oficial já incluído no vendor, aparece sobre os pontos e permanece na altura real da captura, com início verde, fim vermelho e marcador amarelo da visita. Sua visibilidade é opcional. A animação interpola linearmente os centros para preservar esquinas, avança pela distância acumulada a 2 m/s (aproximadamente 135 s) e olha 3 m adiante. É uma velocidade de apresentação, não uma reprodução do tempo original. Não se aplica suavização espacial que possa cortar esquinas. A API CameraAnimation incluída foi inspecionada; seu `play()` não oferece pausa/retomada, por isso um controlador próprio usa o evento `update` do Potree e mantém as bibliotecas oficiais intactas.
+
+Há controles para iniciar, pausar/continuar, reiniciar, exploração livre, vista geral e mostrar/ocultar a trajetória. Iniciar ou continuar faz uma transição de 1,2 s da vista atual até a posição guardada, sem avançar o progresso durante essa transição. Essa transição de retorno não representa um trecho da captura. Entradas manuais no visualizador pausam a visita; menu, troca de puxador e aba do navegador oculta também a interrompem. No celular, os controles EXPLORAR NUVEM/VOLTAR À ROLAGEM continuam disponíveis. A publicação inclui o JSON em `assets/`, mantendo o XML original fora do pacote do Pages.

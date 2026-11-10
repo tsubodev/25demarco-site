@@ -1,3 +1,4 @@
+import { GuidedRoute } from './guided-route.js';
 import { pointClouds as routes } from './point-clouds.js';
 
 const menuButton = document.querySelector('.menu-button');
@@ -21,6 +22,7 @@ interactionButton.addEventListener('click', () => {
 let viewer;
 let viewerReady;
 let three;
+let tour;
 let selectedPerson = '1';
 let hasEntered = false;
 const clouds = new Map();
@@ -33,6 +35,7 @@ function renderRoute() {
   for (const [person, entry] of clouds) {
     for (const cloud of entry.pointclouds || []) cloud.visible = person === selectedPerson && entry.ready;
   }
+  tour?.setActive(selectedPerson === '4' && loaded && startMenu.hidden);
   interactionButton.hidden = !loaded;
   status.hidden = loaded;
   status.textContent = !available
@@ -70,6 +73,7 @@ function setMenu(open) {
   if (open) setInteraction(false);
   document.body.classList.toggle('menu-open', open);
   startMenu.hidden = !open;
+  tour?.setActive(!open && selectedPerson === '4' && Boolean(clouds.get('4')?.ready));
   workspace.inert = open;
   menuButton.setAttribute('aria-expanded', String(open));
   if (open) (document.querySelector('[aria-current="true"]') || firstPerson).focus();
@@ -89,6 +93,7 @@ async function ensureViewer() {
       viewer.setPointBudget(1_000_000);
       viewer.setBackground('white');
       viewer.setDescription('');
+      tour = new GuidedRoute(viewer, three, routes['4'].trajectory, () => frameCloud(clouds.get('4').pointclouds));
     })();
   }
   return viewerReady;
