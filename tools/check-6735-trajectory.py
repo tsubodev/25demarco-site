@@ -20,9 +20,14 @@ assert len(data['frames']) == len(cameras) == 240
 for frame, camera in zip(data['frames'], cameras):
     assert frame['id'] == int(camera.get('id'))
     assert frame['position'] == [float(camera.findtext('transform').split()[i]) for i in (3, 7, 11)]
-positions = [f['position'] for f in data['frames']]
+def rotate(point):
+    x, y, z = point
+    c = math.sqrt(.5)
+    return [c * (x + z), y, c * (z - x)]
+
+positions = [rotate(f['position']) for f in data['frames']]
 length = sum(math.dist(a, b) for a, b in zip(positions, positions[1:]))
-expected = {'6735 / ' + p.parent.name.removesuffix(' - Cloud_converted'): json.loads(p.read_text())['boundingBox']['min']
+expected = {'6735 / ' + p.parent.name.removesuffix(' - Cloud_converted'): rotate(json.loads(p.read_text())['boundingBox']['min'])
             for p in (root / 'pointclouds/6735').glob('*/metadata.json')}
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path='/usr/bin/chromium', args=['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
@@ -36,7 +41,9 @@ with sync_playwright() as p:
         page.locator('[data-person="4"]').click()
         page.wait_for_function('!document.querySelector("#tour-play").disabled', timeout=45000)
         page.wait_for_function('viewer.scene.pointclouds.some(c=>c.numVisiblePoints>0)', timeout=45000)
-        assert page.evaluate('Object.fromEntries(viewer.scene.pointclouds.map(c=>[c.name,c.position.toArray()]))') == expected
+        actual = page.evaluate('Object.fromEntries(viewer.scene.pointclouds.map(c=>[c.name,c.position.toArray()]))')
+        assert actual.keys() == expected.keys()
+        assert all(math.dist(actual[k], expected[k]) < 1e-9 for k in expected)
         samples = page.evaluate('''() => { const g=viewer.scene.scene.getObjectByName('6735 camera trajectory').geometry;
           return Array.from({length:g.attributes.instanceStart.count},(_,i)=>[g.attributes.instanceStart.getX(i),g.attributes.instanceStart.getY(i),g.attributes.instanceStart.getZ(i)]); }''')
         assert len(samples) == 239
@@ -103,9 +110,11 @@ with sync_playwright() as p:
         page.locator('#tour-overview').click()
         assert page.locator('#tour-progress').evaluate('(e)=>e.value') == 0
         assert page.evaluate('viewer.scene.scene.children.filter(c=>c.name==="6735 camera trajectory").length') == 1
-        assert page.evaluate('Object.fromEntries(viewer.scene.pointclouds.filter(c=>c.name.startsWith("6735 / ")).map(c=>[c.name,c.position.toArray()]))') == expected
+        actual = page.evaluate('Object.fromEntries(viewer.scene.pointclouds.filter(c=>c.name.startsWith("6735 / ")).map(c=>[c.name,c.position.toArray()]))')
+        assert actual.keys() == expected.keys()
+        assert all(math.dist(actual[k], expected[k]) < 1e-9 for k in expected)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert not errors and not failures, (errors, failures)
-        print(f'PASS: {width}px; 240 XML centres, path, middle/end playback, pause/resume/restart/exit, menu/route isolation; 17 origins unchanged', flush=True)
+        print(f'PASS: {width}px; 240 XML centres, path, middle/end playback, pause/resume/restart/exit, menu/route isolation; shared +45 degree Y rotation on all 17 clouds and path', flush=True)
         page.close()
     browser.close()

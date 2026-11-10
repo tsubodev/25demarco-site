@@ -114,7 +114,8 @@ async function ensureViewer() {
         const size = span * 80 / height;
         referenceAxes.scale.setScalar(Math.max(.001, size / referenceAxes.userData.axisLength));
       });
-      tour = new GuidedRoute(viewer, three, routes['4'].trajectory, () => frameCloud(clouds.get('4').pointclouds));
+      tour = new GuidedRoute(viewer, three, routes['4'].trajectory, () => frameCloud(clouds.get('4').pointclouds),
+        new three.Matrix4().makeRotationY((routes['4'].rotationYDegrees || 0) * Math.PI / 180));
     })();
   }
   return viewerReady;
@@ -130,6 +131,7 @@ async function loadViewer(person) {
     try {
       await ensureViewer();
       const sources = route.sources || [route];
+      const displayTransform = new three.Matrix4().makeRotationY((route.rotationYDegrees || 0) * Math.PI / 180);
       const pointclouds = await Promise.all(sources.map(async source => {
         const response = await fetch(source.url);
         if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
@@ -144,7 +146,8 @@ async function loadViewer(person) {
         material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
         material.shape = Potree.PointShape.CIRCLE;
         material.activeAttributeName = 'rgba';
-        // Keep Potree's original offset/position. Never translate segments to zero.
+        // Apply one world-origin rotation to every segment; source coordinates stay intact.
+        pointcloud.applyMatrix4(displayTransform);
         pointcloud.visible = false;
         return pointcloud;
       }));

@@ -1,6 +1,7 @@
 """Check the 17 aligned 6735 segments in the PUXADOR 4 viewer."""
 import argparse
 import json
+import math
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -23,10 +24,13 @@ with sync_playwright() as p:
         page.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length === 17',timeout=45000)
         page.wait_for_function('viewer.scene.pointclouds.reduce((n,c)=>n+c.numVisiblePoints,0)>0',timeout=45000)
         page.wait_for_timeout(1500)
-        state = page.evaluate('''() => viewer.scene.pointclouds.map(c=>({name:c.name,position:c.position.toArray(),visible:c.visible,points:c.numVisiblePoints,size:c.material.size,adaptive:c.material.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:c.material.shape===Potree.PointShape.CIRCLE}))''')
+        state = page.evaluate('''() => viewer.scene.pointclouds.map(c=>({name:c.name,position:c.position.toArray(),quaternion:c.quaternion.toArray(),visible:c.visible,points:c.numVisiblePoints,size:c.material.size,adaptive:c.material.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:c.material.shape===Potree.PointShape.CIRCLE}))''')
         assert {c['name'] for c in state} == set(expected)
         for cloud in state:
-            assert cloud['position'] == expected[cloud['name']]['boundingBox']['min'],cloud
+            x,y,z = expected[cloud['name']]['boundingBox']['min']
+            c = math.sqrt(.5)
+            assert math.dist(cloud['position'], [c*(x+z), y, c*(z-x)]) < 1e-9,cloud
+            assert math.dist(cloud['quaternion'], [0, math.sin(math.pi/8), 0, math.cos(math.pi/8)]) < 1e-9,cloud
             assert cloud['visible'] and cloud['size']==.25 and cloud['adaptive'] and cloud['circle'],cloud
         assert page.locator('#viewer-status').is_hidden()
         page.screenshot(path=f'/tmp/6735-{width}.png',full_page=True)
@@ -38,7 +42,7 @@ with sync_playwright() as p:
                 assert page.evaluate('(prefix)=>viewer.scene.pointclouds.filter(c=>c.visible).every(c=>c.name.startsWith(prefix))',prefix)
         assert page.evaluate('viewer.scene.pointclouds.length') == 31
         assert not errors and not failures,(errors,failures)
-        print(f'PASS: {width}px, 17 segments in one viewer, original origins preserved; 1/2/3/4 switching without duplicates',flush=True)
+        print(f'PASS: {width}px, 17 segments in one viewer, shared +45 degree Y rotation verified; 1/2/3/4 switching without duplicates',flush=True)
         print('Rendered segment points:', {c['name']:c['points'] for c in state},flush=True)
         page.close()
     browser.close()

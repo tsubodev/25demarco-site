@@ -93,7 +93,7 @@ O preparador verifica todos os pontos e limita o erro de quantização a 0,00000
 
 `pointclouds/6735/6735 cam.xml` contém 240 câmeras alinhadas do sensor esférico, em um único chunk/componente, com referência `Local Coordinates (m)`. Os nomes `VÍDEO_6735000` a `VÍDEO_6735239` definem a ordem numérica; não há tempos de captura. As matrizes são poses câmera → chunk; seus centros são a última coluna. Não há transformação adicional de chunk/componente. A rotação `region/R` descreve a caixa de recorte, não deve ser aplicada às câmeras.
 
-O mapeamento utilizado para a nuvem existente é identidade: os centros permanecem no referencial local recebido, sem subtrair offsets, recentralizar ou trocar eixos. Os 240 centros estão dentro dos limites dos trechos da 6735. Uma comparação com uma amostra de 1/20 dos pontos originais encontrou distância mediana de 2,37 m e máxima de 4,55 m entre câmeras e superfícies. Isso é evidência de compatibilidade espacial, não substitui uma conferência independente no projeto Metashape; os metadados Potree não declaram projeção nem documentam eventuais transformações externas.
+O mapeamento do XML para os dados originais da nuvem é identidade: os centros permanecem no referencial local recebido, sem subtrair offsets, recentralizar ou trocar eixos. Os 240 centros estão dentro dos limites dos trechos da 6735. Uma comparação com uma amostra de 1/20 dos pontos originais encontrou distância mediana de 2,37 m e máxima de 4,55 m entre câmeras e superfícies. Isso é evidência de compatibilidade espacial, não substitui uma conferência independente no projeto Metashape; os metadados Potree não declaram projeção nem documentam eventuais transformações externas.
 
 Para reproduzir e validar:
 
@@ -113,3 +113,9 @@ Há controles para iniciar, pausar/continuar, reiniciar, exploração livre, vis
 ## Referência de eixos — 6735
 
 O PUXADOR 4 possui uma referência XYZ ancorada na origem mundial `(0, 0, 0)`, com X vermelho, Y verde e Z azul, setas positivas, semieixos negativos discretos e letras voltadas à câmera. A opção **MOSTRAR EIXOS XYZ** permite ocultá-la. O marcador ajusta apenas seu próprio tamanho visual com o zoom para manter a legibilidade; não é uma régua. Não altera posições, offsets, escalas ou orientação das nuvens, nem o percurso guiado. Ele fica oculto no menu e nos outros puxadores.
+
+## Rotação de exibição — 6735
+
+O conjunto do PUXADOR 4 é exibido com **+45° em torno do eixo Y mundial**, tendo `(0, 0, 0)` como pivô. O sentido é anti-horário visto de +Y em direção à origem. A mesma matriz é aplicada uma única vez aos 17 trechos e às 240 posições da trajetória, incluindo marcadores e os alvos da visita guiada. As origens exibidas dos trechos giram em torno do pivô comum; eles não são girados individualmente em seus centros. O enquadramento considera os limites transformados.
+
+A configuração está em `rotationYDegrees: 45` no cadastro do PUXADOR 4. Os arquivos de nuvem, offsets de origem, XML e JSON bruto permanecem intactos; a rotação é aplicada apenas no carregamento para exibição. Os eixos XYZ continuam fixos como referência mundial, e os outros puxadores permanecem sem essa rotação. Os testes `check-6735.py` e `check-6735-trajectory.py` verificam as posições transformadas, a orientação dos trechos e o alinhamento da animação.

@@ -2,10 +2,10 @@ import { Line2 } from '../vendor/potree-1.8.2/libs/three.js/lines/Line2.js';
 import { LineGeometry } from '../vendor/potree-1.8.2/libs/three.js/lines/LineGeometry.js';
 import { LineMaterial } from '../vendor/potree-1.8.2/libs/three.js/lines/LineMaterial.js';
 
-// Only the trajectory and view are changed; never point-cloud transforms.
+// Apply the same display transform as the dataset to the path and camera centres.
 export class GuidedRoute {
-  constructor(viewer, THREE, url, overview) {
-    Object.assign(this, {viewer, THREE, url, overview, speed: 2, distance: 0, playing: false});
+  constructor(viewer, THREE, url, overview, displayTransform = new THREE.Matrix4()) {
+    Object.assign(this, {viewer, THREE, url, overview, displayTransform, speed: 2, distance: 0, playing: false});
     this.panel = document.querySelector('#guided-route');
     this.playButton = document.querySelector('#tour-play');
     this.pauseButton = document.querySelector('#tour-pause');
@@ -48,7 +48,7 @@ export class GuidedRoute {
         if (data.frames.length < 2 || data.frames.some(f => f.position.length !== 3 || !f.position.every(Number.isFinite))) {
           throw new Error('Invalid trajectory');
         }
-        this.points = data.frames.map(f => new this.THREE.Vector3(...f.position));
+        this.points = data.frames.map(f => new this.THREE.Vector3(...f.position).applyMatrix4(this.displayTransform));
         this.lengths = [0];
         for (let i = 1; i < this.points.length; i++) {
           this.lengths.push(this.lengths[i - 1] + this.points[i].distanceTo(this.points[i - 1]));
@@ -56,7 +56,7 @@ export class GuidedRoute {
         this.total = this.lengths[this.lengths.length - 1];
         if (!(this.total > 0)) throw new Error('Empty trajectory');
         const geometry = new LineGeometry();
-        geometry.setPositions(data.frames.flatMap(f => f.position));
+        geometry.setPositions(this.points.flatMap(point => point.toArray()));
         this.path = new Line2(geometry, new LineMaterial({color: 0x982ea8, linewidth: 3, depthTest: false, depthWrite: false}));
         this.path.name = '6735 camera trajectory';
         this.path.renderOrder = 100;

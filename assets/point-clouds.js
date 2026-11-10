@@ -59,6 +59,7 @@ export const pointClouds = {
   },
   '4': {
   "name": "6735",
+  "rotationYDegrees": 45,
   "trajectory": "./6735-trajectory.json",
   "sources": [
     {
