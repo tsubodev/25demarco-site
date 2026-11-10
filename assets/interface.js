@@ -53,6 +53,12 @@ function renderRoute() {
       : 'Carregando o percurso…';
 }
 
+function displayTransformFor(route) {
+  // World axes: first the existing Y rotation, then X, about the same origin.
+  return new three.Matrix4().makeRotationX((route.rotationXDegrees || 0) * Math.PI / 180)
+    .multiply(new three.Matrix4().makeRotationY((route.rotationYDegrees || 0) * Math.PI / 180));
+}
+
 function frameCloud(pointclouds) {
   // Frame just this route, rather than the bounding boxes of cached hidden clouds.
   const frame = new three.Object3D();
@@ -115,7 +121,7 @@ async function ensureViewer() {
         referenceAxes.scale.setScalar(Math.max(.001, size / referenceAxes.userData.axisLength));
       });
       tour = new GuidedRoute(viewer, three, routes['4'].trajectory, () => frameCloud(clouds.get('4').pointclouds),
-        new three.Matrix4().makeRotationY((routes['4'].rotationYDegrees || 0) * Math.PI / 180));
+        displayTransformFor(routes['4']));
     })();
   }
   return viewerReady;
@@ -131,7 +137,7 @@ async function loadViewer(person) {
     try {
       await ensureViewer();
       const sources = route.sources || [route];
-      const displayTransform = new three.Matrix4().makeRotationY((route.rotationYDegrees || 0) * Math.PI / 180);
+      const displayTransform = displayTransformFor(route);
       const pointclouds = await Promise.all(sources.map(async source => {
         const response = await fetch(source.url);
         if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);

@@ -119,3 +119,7 @@ O PUXADOR 4 possui uma referência XYZ ancorada na origem mundial `(0, 0, 0)`, c
 O conjunto do PUXADOR 4 é exibido com **+45° em torno do eixo Y mundial**, tendo `(0, 0, 0)` como pivô. O sentido é anti-horário visto de +Y em direção à origem. A mesma matriz é aplicada uma única vez aos 17 trechos e às 240 posições da trajetória, incluindo marcadores e os alvos da visita guiada. As origens exibidas dos trechos giram em torno do pivô comum; eles não são girados individualmente em seus centros. O enquadramento considera os limites transformados.
 
 A configuração está em `rotationYDegrees: 45` no cadastro do PUXADOR 4. Os arquivos de nuvem, offsets de origem, XML e JSON bruto permanecem intactos; a rotação é aplicada apenas no carregamento para exibição. Os eixos XYZ continuam fixos como referência mundial, e os outros puxadores permanecem sem essa rotação. Os testes `check-6735.py` e `check-6735-trajectory.py` verificam as posições transformadas, a orientação dos trechos e o alinhamento da animação.
+
+### Rotação adicional em X
+
+Após os +45° em Y, o conjunto 6735 e o percurso recebem **+90° em X mundial**, anti-horário visto de +X em direção à origem. A composição única de exibição é `Rx(90°) × Ry(45°)`, em torno de `(0, 0, 0)`. `rotationXDegrees: 90` e `rotationYDegrees: 45` ficam no cadastro do PUXADOR 4. Nuvens, trajetória, marcadores e visita recebem a mesma composição, aplicada uma vez ao carregar. Os eixos de referência permanecem mundiais e os arquivos originais continuam intactos.
