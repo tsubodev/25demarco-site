@@ -28,10 +28,10 @@ const clouds = new Map();
 function renderRoute() {
   const available = Boolean(routes[selectedPerson]);
   const record = clouds.get(selectedPerson);
-  const loaded = Boolean(record?.pointcloud);
+  const loaded = Boolean(record?.ready);
   viewerFrame.classList.toggle('route-pending', !available);
   for (const [person, entry] of clouds) {
-    if (entry.pointcloud) entry.pointcloud.visible = person === selectedPerson;
+    for (const cloud of entry.pointclouds || []) cloud.visible = person === selectedPerson && entry.ready;
   }
   interactionButton.hidden = !loaded;
   status.hidden = loaded;
@@ -42,10 +42,10 @@ function renderRoute() {
       : 'Carregando o percurso…';
 }
 
-function frameCloud(pointcloud) {
+function frameCloud(pointclouds) {
   // Frame just this route, rather than the bounding boxes of cached hidden clouds.
   const frame = new three.Object3D();
-  frame.boundingBox = viewer.getBoundingBox([pointcloud]);
+  frame.boundingBox = viewer.getBoundingBox(pointclouds);
   viewer.zoomTo(frame, 1);
   viewer.controls.stop();
 }
@@ -61,8 +61,8 @@ function openExperience(person) {
   setInteraction(false);
   renderRoute();
   setMenu(false);
-  const cloud = clouds.get(person)?.pointcloud;
-  if (cloud) frameCloud(cloud);
+  const record = clouds.get(person);
+  if (record?.ready) frameCloud(record.pointclouds);
   else if (routes[person]) loadViewer(person);
 }
 
@@ -103,25 +103,31 @@ async function loadViewer(person) {
     renderRoute();
     try {
       await ensureViewer();
-      const response = await fetch(route.url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      let timeout;
-      const { pointcloud } = await Promise.race([
-        Potree.loadPointCloud(route.url, route.name),
-        new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Tempo de carregamento excedido')), 45000); }),
-      ]).finally(() => clearTimeout(timeout));
-      pointcloud.name = route.name;
-      const material = pointcloud.material;
-      material.size = 0.25;
-      material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-      material.shape = Potree.PointShape.CIRCLE;
-      material.activeAttributeName = 'rgba';
-      pointcloud.visible = false;
-      record.pointcloud = pointcloud;
-      viewer.scene.addPointCloud(pointcloud);
+      const sources = route.sources || [route];
+      const pointclouds = await Promise.all(sources.map(async source => {
+        const response = await fetch(source.url);
+        if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
+        let timeout;
+        const { pointcloud } = await Promise.race([
+          Potree.loadPointCloud(source.url, source.name),
+          new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Tempo de carregamento excedido')), 45000); }),
+        ]).finally(() => clearTimeout(timeout));
+        pointcloud.name = source.name;
+        const material = pointcloud.material;
+        material.size = 0.25;
+        material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+        material.shape = Potree.PointShape.CIRCLE;
+        material.activeAttributeName = 'rgba';
+        // Keep Potree's original offset/position. Never translate segments to zero.
+        pointcloud.visible = false;
+        return pointcloud;
+      }));
+      record.pointclouds = pointclouds;
+      record.ready = true;
+      for (const pointcloud of pointclouds) viewer.scene.addPointCloud(pointcloud);
       renderRoute();
       // A previous download completing must not replace the current page's camera.
-      if (selectedPerson === person) frameCloud(pointcloud);
+      if (selectedPerson === person) frameCloud(record.pointclouds);
     } catch (error) {
       console.error(`Não foi possível carregar o percurso ${person}:`, error);
       record.error = true;
