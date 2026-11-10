@@ -1,3 +1,4 @@
+import { createReferenceAxes } from './reference-axes.js';
 import { GuidedRoute } from './guided-route.js';
 import { pointClouds as routes } from './point-clouds.js';
 
@@ -23,6 +24,12 @@ let viewer;
 let viewerReady;
 let three;
 let tour;
+let referenceAxes;
+const axesToggle = document.querySelector('#reference-axes-toggle');
+function syncReferenceAxes() {
+  if (referenceAxes) referenceAxes.visible = selectedPerson === '4' && Boolean(clouds.get('4')?.ready) && startMenu.hidden && axesToggle.checked;
+}
+axesToggle.addEventListener('change', syncReferenceAxes);
 let selectedPerson = '1';
 let hasEntered = false;
 const clouds = new Map();
@@ -36,6 +43,7 @@ function renderRoute() {
     for (const cloud of entry.pointclouds || []) cloud.visible = person === selectedPerson && entry.ready;
   }
   tour?.setActive(selectedPerson === '4' && loaded && startMenu.hidden);
+  syncReferenceAxes();
   interactionButton.hidden = !loaded;
   status.hidden = loaded;
   status.textContent = !available
@@ -74,6 +82,7 @@ function setMenu(open) {
   document.body.classList.toggle('menu-open', open);
   startMenu.hidden = !open;
   tour?.setActive(!open && selectedPerson === '4' && Boolean(clouds.get('4')?.ready));
+  syncReferenceAxes();
   workspace.inert = open;
   menuButton.setAttribute('aria-expanded', String(open));
   if (open) (document.querySelector('[aria-current="true"]') || firstPerson).focus();
@@ -93,6 +102,18 @@ async function ensureViewer() {
       viewer.setPointBudget(1_000_000);
       viewer.setBackground('white');
       viewer.setDescription('');
+      referenceAxes = createReferenceAxes(three);
+      viewer.scene.scene.add(referenceAxes);
+      // Keep the origin reference legible while orbiting/zooming; this is not a ruler.
+      viewer.addEventListener('update', () => {
+        if (!referenceAxes.visible) return;
+        const camera = viewer.scene.getActiveCamera();
+        const distance = viewer.scene.view.position.distanceTo(referenceAxes.position);
+        const height = Math.max(1, viewer.renderer.domElement.clientHeight);
+        const span = camera.isPerspectiveCamera ? 2 * distance * Math.tan(camera.fov * Math.PI / 360) : camera.top - camera.bottom;
+        const size = span * 80 / height;
+        referenceAxes.scale.setScalar(Math.max(.001, size / referenceAxes.userData.axisLength));
+      });
       tour = new GuidedRoute(viewer, three, routes['4'].trajectory, () => frameCloud(clouds.get('4').pointclouds));
     })();
   }

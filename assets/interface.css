@@ -101,3 +101,5 @@ button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 7px; }
 .tour-buttons button:disabled { opacity: .45; cursor: default; }
 .guided-route progress { width: 100%; accent-color: var(--yellow, #efefa3); }
 .guided-route p { margin: 8px 0 0; font-size: 14px; }
+
+.guided-route label + label { margin-top: 10px; }
