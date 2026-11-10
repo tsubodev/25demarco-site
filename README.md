@@ -20,7 +20,9 @@ Clone `https://github.com/potree/potree` na tag `1.8.2` em uma pasta separada, e
 
 ## Publicação
 
-No GitHub Pages, a origem deve ser a branch `main`, pasta `/ (root)`. `.nojekyll` mantém a publicação estática. O envio para `main` não confirma, por si só, que o deploy terminou.
+No GitHub Pages, selecione **Settings → Pages → Build and deployment → Source → GitHub Actions**. O workflow `.github/workflows/pages.yml` publica automaticamente os commits de `main`.
+
+`python3 tools/build-site.py /tmp/25demarco-site-build` prepara o pacote em um diretório novo, fora do repositório. Ele inclui apenas a aplicação, as bibliotecas e os datasets de exibição dos quatro puxadores; originais, XMLs e ferramentas permanecem no Git, fora do pacote publicado. Isso mantém a publicação abaixo do limite de 1 GB do Pages. `.nojekyll` mantém a publicação estática. O envio para `main` não confirma, por si só, que o deploy terminou.
 
 ## Interface alpha
 
