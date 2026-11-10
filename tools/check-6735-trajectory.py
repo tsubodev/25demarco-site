@@ -53,8 +53,12 @@ with sync_playwright() as p:
         assert page.evaluate('!viewer.scene.scene.getObjectByName("6735 camera trajectory").visible')
         page.locator('#tour-path').check()
         page.screenshot(path=f'/tmp/6735-trajectory-overview-{width}.png', full_page=True)
+        page.evaluate('viewer.scene.view.pitch = -.6')
         page.locator('#tour-play').click()
+        page.wait_for_timeout(150)
+        assert abs(page.evaluate('viewer.scene.view.pitch')) < 1e-10, 'Pitch should be locked even during return transition'
         page.wait_for_function('document.querySelector("#tour-progress").value > .003')
+        assert abs(page.evaluate('viewer.scene.view.pitch')) < 1e-10
         page.locator('#tour-pause').click()
         position = page.evaluate('viewer.scene.view.position.toArray()')
         progress = page.locator('#tour-progress').evaluate('(e)=>e.value')
@@ -70,11 +74,14 @@ with sync_playwright() as p:
             print('PASS: complete desktop tour played in real time to final XML position', flush=True)
             page.locator('#tour-restart').click()
             page.wait_for_function('document.querySelector("#tour-progress").value > .003')
-        # Advance presentation time to check middle/end without a two-minute wait.
+        # Advance presentation time to check middle/end without waiting for the whole tour.
         page.evaluate('window.realNow = performance.now.bind(performance); window.offset=0; performance.now=()=>realNow()+offset')
-        page.evaluate('(s)=>window.offset+=s*1000', length / 4)
+        before_step = page.locator('#tour-progress').evaluate('(e)=>e.value')
+        page.evaluate('(s)=>window.offset+=s*1000', length / 8)
         page.wait_for_function('document.querySelector("#tour-progress").value > .49')
+        assert abs(page.evaluate('viewer.scene.view.pitch')) < 1e-10, 'Pitch changed halfway through the tour'
         sample = page.evaluate('({distance: document.querySelector("#tour-progress").value, position: viewer.scene.view.position.toArray()})')
+        assert .49 < sample['distance'] - before_step < .56, 'Expected 4 m/s presentation speed'
         remaining = sample['distance'] * length
         for a, b in zip(positions, positions[1:]):
             step = math.dist(a, b)
@@ -84,16 +91,20 @@ with sync_playwright() as p:
                 break
             remaining -= step
         page.screenshot(path=f'/tmp/6735-trajectory-middle-{width}.png', full_page=True)
-        page.evaluate('(s)=>window.offset+=s*1000', length / 2)
+        page.evaluate('(s)=>window.offset+=s*1000', length / 4)
         page.wait_for_function('document.querySelector("#tour-progress").value === 1')
         page.evaluate('performance.now=window.realNow')
         assert page.locator('#tour-status').inner_text() == 'Visita concluída.'
+        assert abs(page.evaluate('viewer.scene.view.pitch')) < 1e-10
         assert math.dist(page.evaluate('viewer.scene.view.position.toArray()'), positions[-1]) < 1e-10
         page.screenshot(path=f'/tmp/6735-trajectory-end-{width}.png', full_page=True)
         page.locator('#tour-restart').click()
         page.wait_for_function('document.querySelector("#tour-progress").value < .1')
         page.locator('#tour-exit').click()
         assert 'Exploração livre' in page.locator('#tour-status').inner_text()
+        page.evaluate('viewer.scene.view.pitch = -.4')
+        page.wait_for_timeout(150)
+        assert abs(page.evaluate('viewer.scene.view.pitch') + .4) < 1e-10, 'Free exploration must retain tilt'
         # Rejoining from a different free view must not teleport on click.
         page.evaluate('viewer.scene.view.position.x+=10')
         free_position = page.evaluate('viewer.scene.view.position.toArray()')
@@ -115,6 +126,6 @@ with sync_playwright() as p:
         assert all(math.dist(actual[k], expected[k]) < 1e-9 for k in expected)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert not errors and not failures, (errors, failures)
-        print(f'PASS: {width}px; 240 XML centres, path, middle/end playback, pause/resume/restart/exit, menu/route isolation; shared +45Y then +90X rotation on all 17 clouds and path', flush=True)
+        print(f'PASS: {width}px; 240 XML centres, path, middle/end playback, pause/resume/restart/exit, menu/route isolation, 4 m/s and level gaze; shared +45Y then +90X rotation on all 17 clouds and path', flush=True)
         page.close()
     browser.close()

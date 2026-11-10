@@ -5,7 +5,7 @@ import { LineMaterial } from '../vendor/potree-1.8.2/libs/three.js/lines/LineMat
 // Apply the same display transform as the dataset to the path and camera centres.
 export class GuidedRoute {
   constructor(viewer, THREE, url, overview, displayTransform = new THREE.Matrix4()) {
-    Object.assign(this, {viewer, THREE, url, overview, displayTransform, speed: 2, distance: 0, playing: false});
+    Object.assign(this, {viewer, THREE, url, overview, displayTransform, speed: 4, distance: 0, playing: false});
     this.panel = document.querySelector('#guided-route');
     this.playButton = document.querySelector('#tour-play');
     this.pauseButton = document.querySelector('#tour-pause');
@@ -106,6 +106,9 @@ export class GuidedRoute {
     const direction = distance < this.total - .001
       ? ahead.sub(position)
       : position.clone().sub(this.positionAt(Math.max(0, distance - 3)));
+    // Keep the gaze level in world Z while following horizontal route turns.
+    direction.z = 0;
+    if (direction.lengthSq() < 1e-12) direction.set(0, 1, 0);
     return {position, target: position.clone().add(direction.normalize().multiplyScalar(3))};
   }
 
@@ -160,6 +163,12 @@ export class GuidedRoute {
       this.distance = Math.min(this.total, this.distance + delta * this.speed);
       frame = this.frameAt(this.distance);
       this.current.position.copy(frame.position);
+    }
+    // The return transition must obey the same pitch lock as the tour.
+    frame.target.z = frame.position.z;
+    if (Math.hypot(frame.target.x - frame.position.x, frame.target.y - frame.position.y) < 1e-9) {
+      const heading = this.frameAt(this.distance);
+      frame.target.copy(frame.position).add(heading.target.sub(heading.position));
     }
     this.viewer.scene.view.position.copy(frame.position);
     this.viewer.scene.view.lookAt(frame.target);

@@ -106,7 +106,7 @@ python3 tools/check-6735-trajectory.py --url http://127.0.0.1:8000/ --full-playb
 
 O JSON `assets/6735-trajectory.json` preserva os centros sem suavização, identifica o hash do XML, as unidades, a matriz identidade e os tempos ausentes (`null`). O preparador rejeita frames ausentes, centros consecutivos repetidos e saltos acima de 5 m ou cinco vezes a mediana, exigindo revisão antes de ligar possíveis sessões. Neste XML o maior passo é 2,18 m; o caminho mede cerca de 270,13 m.
 
-A linha de 3 pixels usa o Line2 oficial já incluído no vendor, aparece sobre os pontos e permanece na altura real da captura, com início verde, fim vermelho e marcador amarelo da visita. Sua visibilidade é opcional. A animação interpola linearmente os centros para preservar esquinas, avança pela distância acumulada a 2 m/s (aproximadamente 135 s) e olha 3 m adiante. É uma velocidade de apresentação, não uma reprodução do tempo original. Não se aplica suavização espacial que possa cortar esquinas. A API CameraAnimation incluída foi inspecionada; seu `play()` não oferece pausa/retomada, por isso um controlador próprio usa o evento `update` do Potree e mantém as bibliotecas oficiais intactas.
+A linha de 3 pixels usa o Line2 oficial já incluído no vendor, aparece sobre os pontos e permanece na altura real da captura, com início verde, fim vermelho e marcador amarelo da visita. Sua visibilidade é opcional. A animação interpola linearmente os centros para preservar esquinas, avança pela distância acumulada a 4 m/s (aproximadamente 68 s) e olha 3 m adiante. É uma velocidade de apresentação, não uma reprodução do tempo original. Não se aplica suavização espacial que possa cortar esquinas. A API CameraAnimation incluída foi inspecionada; seu `play()` não oferece pausa/retomada, por isso um controlador próprio usa o evento `update` do Potree e mantém as bibliotecas oficiais intactas.
 
 Há controles para iniciar, pausar/continuar, reiniciar, exploração livre, vista geral e mostrar/ocultar a trajetória. Iniciar ou continuar faz uma transição de 1,2 s da vista atual até a posição guardada, sem avançar o progresso durante essa transição. Essa transição de retorno não representa um trecho da captura. Entradas manuais no visualizador pausam a visita; menu, troca de puxador e aba do navegador oculta também a interrompem. No celular, os controles EXPLORAR NUVEM/VOLTAR À ROLAGEM continuam disponíveis. A publicação inclui o JSON em `assets/`, mantendo o XML original fora do pacote do Pages.
 
@@ -123,3 +123,11 @@ A configuração está em `rotationYDegrees: 45` no cadastro do PUXADOR 4. Os ar
 ### Rotação adicional em X
 
 Após os +45° em Y, o conjunto 6735 e o percurso recebem **+90° em X mundial**, anti-horário visto de +X em direção à origem. A composição única de exibição é `Rx(90°) × Ry(45°)`, em torno de `(0, 0, 0)`. `rotationXDegrees: 90` e `rotationYDegrees: 45` ficam no cadastro do PUXADOR 4. Nuvens, trajetória, marcadores e visita recebem a mesma composição, aplicada uma vez ao carregar. Os eixos de referência permanecem mundiais e os arquivos originais continuam intactos.
+
+### Velocidade da visita
+
+A velocidade de apresentação foi duplicada de 2 para **4 m/s**. O percurso de aproximadamente 270 m leva cerca de 68 segundos, além da transição inicial de 1,2 s. Isso altera apenas o avanço da visita guiada; os controles de exploração livre permanecem independentes.
+
+### Câmera nivelada durante a visita
+
+Durante a visita guiada, inclusive na transição de retorno, a câmera mantém inclinação vertical zero (`view.pitch = 0` no referencial Z vertical do Potree). O alvo do olhar fica na mesma altura da câmera; a direção horizontal acompanha as curvas do percurso. A câmera continua seguindo todas as posições 3D da trajetória, inclusive suas variações de altura. Pausar ou sair permite voltar a inclinar livremente a vista. O bloqueio não muda nuvens, rotação do conjunto ou coordenadas do percurso.
