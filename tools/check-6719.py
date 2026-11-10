@@ -30,13 +30,13 @@ with sync_playwright() as p:
             assert cloud['visible'] and cloud['size']==.25 and cloud['adaptive'] and cloud['circle'],cloud
         assert page.locator('#viewer-status').is_hidden()
         page.screenshot(path=f'/tmp/6719-{width}.png',full_page=True)
-        for person, count, prefix in (('1',1,'6716'),('2',1,'6718'),('3',12,'6719 / '),('4',0,''),('3',12,'6719 / ')):
+        for person, count, prefix in (('1',1,'6716'),('2',1,'6718'),('3',12,'6719 / '),('4',17,'6735 / '),('3',12,'6719 / ')):
             page.locator('.menu-button').click()
             page.locator(f'[data-person="{person}"]').click()
             page.wait_for_function('(n)=>viewer.scene.pointclouds.filter(c=>c.visible).length===n',arg=count,timeout=45000)
             if count:
                 assert page.evaluate('(prefix)=>viewer.scene.pointclouds.filter(c=>c.visible).every(c=>c.name.startsWith(prefix))',prefix)
-        assert page.evaluate('viewer.scene.pointclouds.length') == 14
+        assert page.evaluate('viewer.scene.pointclouds.length') == 31
         assert not errors and not failures,(errors,failures)
         print(f'PASS: {width}px, 12 segments in one viewer, original origins preserved; 1/2/3/4 switching without duplicates',flush=True)
         print('Rendered segment points:', {c['name']:c['points'] for c in state},flush=True)

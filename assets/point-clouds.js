@@ -57,5 +57,77 @@ export const pointClouds = {
       }
     ]
   },
-  '4': null,
+  '4': {
+  "name": "6735",
+  "sources": [
+    {
+      "url": "pointclouds/6735/static/6735.1 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.1"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.21 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.21"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.22 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.22"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.23 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.23"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.31 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.31"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.32 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.32"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.33 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.33"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.34 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.34"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.35 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.35"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.41 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.41"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.42 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.42"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.43 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.43"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.441 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.441"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.442 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.442"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.443 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.443"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.45 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.45"
+    },
+    {
+      "url": "pointclouds/6735/static/6735.5 - Cloud_converted/cloud.js",
+      "name": "6735 / 6735.5"
+    }
+  ]
+},
 };
