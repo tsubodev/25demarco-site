@@ -77,9 +77,10 @@ with sync_playwright() as p:
             page.locator('#tour-restart').click()
             page.wait_for_function('document.querySelector("#tour-progress").value > .003')
         # Advance presentation time to check middle/end without waiting for the whole tour.
-        page.evaluate('window.realNow = performance.now.bind(performance); window.offset=0; performance.now=()=>realNow()+offset')
+        page.evaluate('window.realNow = performance.now.bind(performance); window.tourTime=realNow(); performance.now=()=>tourTime')
+        page.wait_for_timeout(150)  # Let playback observe the frozen clock before sampling.
         before_step = page.locator('#tour-progress').evaluate('(e)=>e.value')
-        page.evaluate('(s)=>window.offset+=s*1000', length / 8)
+        page.evaluate('(s)=>window.tourTime+=s*1000', length / 8)
         page.wait_for_function('document.querySelector("#tour-progress").value > .49')
         assert abs(page.evaluate('viewer.scene.view.pitch')) < 1e-10, 'Pitch changed halfway through the tour'
         sample = page.evaluate('({distance: document.querySelector("#tour-progress").value, position: viewer.scene.view.position.toArray()})')
@@ -93,7 +94,7 @@ with sync_playwright() as p:
                 break
             remaining -= step
         page.screenshot(path=f'/tmp/6735-trajectory-middle-{width}.png', full_page=True)
-        page.evaluate('(s)=>window.offset+=s*1000', length / 4)
+        page.evaluate('(s)=>window.tourTime+=s*1000', length / 4)
         page.wait_for_function('document.querySelector("#tour-progress").value === 1')
         page.evaluate('performance.now=window.realNow')
         assert page.locator('#tour-status').inner_text() == 'Visita concluída.'

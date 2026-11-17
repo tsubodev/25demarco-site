@@ -11,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/openlayers3/ol.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/spectrum/spectrum.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/jstree/themes/mixed/style.css">
-  <link rel="stylesheet" href="assets/interface.css?v=layout-pdf-2">
+  <link rel="stylesheet" href="assets/interface.css?v=layout-subpages-1">
 </head>
 <body class="home-view menu-open">
   <header class="site-header">
@@ -20,6 +20,11 @@
   </header>
   <main class="workspace" id="workspace" inert>
     <section class="viewer-frame" aria-label="Visualização interativa do percurso">
+      <nav id="route-pages" class="page-navigation" aria-label="Páginas do puxador">
+        <button id="page-previous" type="button" aria-label="Página anterior">← <span>Anterior</span></button>
+        <span id="page-indicator" role="status" aria-live="polite" aria-atomic="true">1 / 9</span>
+        <button id="page-next" type="button" aria-label="Próxima página"><span>Próxima</span> →</button>
+      </nav>
       <div id="potree_render_area" class="potree_container"></div>
       <button id="viewer-interaction" class="viewer-interaction" type="button" aria-pressed="false">EXPLORAR NUVEM</button>
       <p id="viewer-status" class="viewer-status" role="status">Selecione um puxador para conhecer seu percurso.</p>
@@ -74,6 +79,6 @@
 	<script src="vendor/potree-1.8.2/build/potree/potree.js"></script>
 	<script src="vendor/potree-1.8.2/libs/plasio/js/laslaz.js"></script>
 
-  <script type="module" src="assets/interface.js?v=layout-pdf-2"></script>
+  <script type="module" src="assets/interface.js?v=layout-subpages-1"></script>
 </body>
 </html>

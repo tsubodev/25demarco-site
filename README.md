@@ -131,3 +131,15 @@ A velocidade de apresentação foi duplicada de 2 para **4 m/s**. O percurso de 
 ### Câmera nivelada durante a visita
 
 Durante a visita guiada, inclusive na transição de retorno, a câmera mantém inclinação vertical zero (`view.pitch = 0` no referencial Z vertical do Potree). O alvo do olhar fica na mesma altura da câmera; a direção horizontal acompanha as curvas do percurso. A câmera continua seguindo todas as posições 3D da trajetória, inclusive suas variações de altura. Pausar ou sair permite voltar a inclinar livremente a vista. O bloqueio não muda nuvens, rotação do conjunto ou coordenadas do percurso.
+
+## Subpáginas dos puxadores — amostra
+
+Após escolher um puxador, a barra sobre a nuvem oferece **Anterior**, contador e **Próxima**. O cadastro `assets/route-pages.js` representa as páginas do PDF: Guilherme 3–11 (9 subpáginas), Emily 12–14 (3), Tiago 15–16 (2) e Benne 17–22 (6). Cada página possui o mapa correspondente, com a posição luminosa original da referência. Relatos e fotografias são compartilhados dentro do mesmo puxador, como no PDF.
+
+As subpáginas mantêm a nuvem e a vista atual, sem duplicar objetos, alterar transformações ou inventar posições 3D para cada mapa. Mudar de subpágina pausa uma visita guiada em andamento. A última página escolhida é lembrada ao reabrir um puxador na mesma sessão. Links como `#puxador-4/pagina-6` abrem diretamente a subpágina; voltar/avançar do navegador também restaura a seleção.
+
+Para verificar navegação, limites, mapas, links diretos, histórico e preservação da cena:
+
+```sh
+python3 tools/check-subpages.py --url http://127.0.0.1:8000/
+```

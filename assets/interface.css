@@ -74,3 +74,15 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
  .menu-open .workspace { height: calc(100dvh - var(--header-height)); overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+.page-navigation { position: absolute; z-index: 4; top: 12px; left: 20px; right: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px; background: #1f184ef2; border: 1px solid #f2f1a440; }
+.page-navigation button { min-height: 40px; padding: 8px 14px; background: none; border: 0; font-size: 14px; }
+.page-navigation button:hover:not(:disabled) { background: #f2f1a415; }
+.page-navigation button:disabled { opacity: .3; cursor: default; }
+#page-indicator { font-size: 14px; text-align: center; }
+@media (max-width: 700px) {
+ .page-navigation { top: 0; left: 0; right: 0; gap: 3px; }
+ .page-navigation button { padding: 8px; font-size: 12px; }
+ #page-indicator { font-size: 12px; }
+ .viewer-interaction { top: 64px; }
+}

@@ -1,3 +1,4 @@
+import { routePages } from './route-pages.js';
 import { introduction, peopleContent } from './people.js';
 import { createReferenceAxes } from './reference-axes.js';
 import { GuidedRoute } from './guided-route.js';
@@ -38,6 +39,28 @@ let selectedPerson = '1';
 let hasEntered = false;
 let menuExpanded = false;
 const clouds = new Map();
+const currentPages = new Map();
+const previousPage = document.querySelector('#page-previous');
+const nextPage = document.querySelector('#page-next');
+
+function showSubpage(index, writeHistory = true) {
+  const pages = routePages[selectedPerson];
+  index = Math.max(0, Math.min(pages.length - 1, index));
+  currentPages.set(selectedPerson, index);
+  const content = peopleContent[selectedPerson];
+  const map = document.querySelector('#route-map');
+  map.src = pages[index].map;
+  map.alt = `Mapa do percurso de ${content.name}, página ${index + 1} de ${pages.length}`;
+  document.querySelector('#page-indicator').textContent = `${content.name} · ${index + 1} / ${pages.length}`;
+  previousPage.disabled = index === 0;
+  nextPage.disabled = index === pages.length - 1;
+  // Page changes do not reposition or reload any point cloud or the free view.
+  tour?.pause();
+  const hash = `#puxador-${selectedPerson}/pagina-${index + 1}`;
+  if (writeHistory && location.hash !== hash) history.pushState(null, '', hash);
+}
+previousPage.addEventListener('click', () => showSubpage(currentPages.get(selectedPerson) - 1));
+nextPage.addEventListener('click', () => showSubpage(currentPages.get(selectedPerson) + 1));
 
 function renderRoute() {
   const available = Boolean(routes[selectedPerson]);
@@ -72,7 +95,7 @@ function frameCloud(pointclouds) {
   viewer.controls.stop();
 }
 
-function openExperience(person) {
+function openExperience(person, page = currentPages.get(person) ?? 0, writeHistory = true) {
   selectedPerson = person;
   hasEntered = true;
   people.forEach(button => {
@@ -82,9 +105,7 @@ function openExperience(person) {
   const content = peopleContent[person];
   document.querySelector('#person-heading span').textContent = `PUXADOR ${person} - ${content.name.toUpperCase()}`;
   document.querySelector('#person-story').textContent = content.story;
-  const map = document.querySelector('#route-map');
-  map.src = content.map;
-  map.alt = `Mapa do percurso de ${content.name}`;
+  showSubpage(page, writeHistory);
   const photos = document.querySelector('.photo-column');
   photos.replaceChildren(...content.photos.map((src, index) => {
     const image = document.createElement('img');
@@ -205,6 +226,7 @@ menuButton.addEventListener('click', () => setMenu(!menuExpanded));
 document.querySelector('.start-button').addEventListener('click', () => setMenu(true));
 document.querySelector('#home-button').addEventListener('click', () => {
   hasEntered = false;
+  if (location.hash) history.pushState(null, '', location.pathname + location.search);
   setInteraction(false);
   setMenu(false);
 });
@@ -212,3 +234,24 @@ document.addEventListener('keydown', event => {
   if (event.key !== 'Escape') return;
   if (menuExpanded || hasEntered) setMenu(!menuExpanded);
 });
+
+function restoreLocation() {
+  const match = location.hash.match(/^#puxador-([1-4])\/pagina-([1-9]\d*)$/);
+  if (!match) {
+    if (!location.hash && hasEntered) {
+      hasEntered = false;
+      setInteraction(false);
+      setMenu(false);
+    }
+    return;
+  }
+  const person = match[1];
+  const page = Math.min(Number(match[2]) - 1, routePages[person].length - 1);
+  if (hasEntered && selectedPerson === person) {
+    if (currentPages.get(person) !== page) showSubpage(page, false);
+    if (menuExpanded) setMenu(false);
+  } else openExperience(person, page, false);
+}
+window.addEventListener('popstate', restoreLocation);
+window.addEventListener('hashchange', restoreLocation);
+restoreLocation();
