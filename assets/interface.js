@@ -82,8 +82,9 @@ function renderRoute() {
 }
 
 function displayTransformFor(route) {
-  // World axes: first the existing Y rotation, then X, about the same origin.
-  return new three.Matrix4().makeRotationX((route.rotationXDegrees || 0) * Math.PI / 180)
+  // World axes: retain Y then X, and apply the final Y adjustment about the same origin.
+  return new three.Matrix4().makeRotationY((route.worldYAdjustmentDegrees || 0) * Math.PI / 180)
+    .multiply(new three.Matrix4().makeRotationX((route.rotationXDegrees || 0) * Math.PI / 180))
     .multiply(new three.Matrix4().makeRotationY((route.rotationYDegrees || 0) * Math.PI / 180));
 }
 

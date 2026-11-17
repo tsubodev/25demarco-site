@@ -143,3 +143,7 @@ Para verificar navegação, limites, mapas, links diretos, histórico e preserva
 ```sh
 python3 tools/check-subpages.py --url http://127.0.0.1:8000/
 ```
+
+### Ajuste final de 5° horário em Y
+
+A orientação anterior recebe mais **−5° em Y mundial**, no sentido horário visto de +Y em direção à origem. A composição atual é `Ry(−5°) × Rx(90°) × Ry(45°)`, com pivô em `(0, 0, 0)`. O campo `worldYAdjustmentDegrees: -5` é aplicado depois das rotações anteriores, tanto aos 17 point clouds quanto à trajetória, marcadores e visita guiada. Não equivale a alterar a primeira rotação em Y de 45° para 40°, pois há uma rotação em X entre elas. Os arquivos originais continuam intactos.

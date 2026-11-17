@@ -30,8 +30,12 @@ with sync_playwright() as p:
         for cloud in state:
             x,y,z = expected[cloud['name']]['boundingBox']['min']
             c = math.sqrt(.5)
-            assert math.dist(cloud['position'], [c*(x+z), c*(x-z), y]) < 1e-9,cloud
-            assert math.dist(cloud['quaternion'], [c*math.cos(math.pi/8), c*math.sin(math.pi/8), c*math.sin(math.pi/8), c*math.cos(math.pi/8)]) < 1e-9,cloud
+            angle = math.radians(-5)
+            a = c*(x+z)
+            assert math.dist(cloud['position'], [math.cos(angle)*a+math.sin(angle)*y, c*(x-z), -math.sin(angle)*a+math.cos(angle)*y]) < 1e-9,cloud
+            u,v = math.sin(angle/2),math.cos(angle/2)
+            ca,sa = math.cos(math.pi/8),math.sin(math.pi/8)
+            assert math.dist(cloud['quaternion'], [c*(v*ca+u*sa), c*(v*sa+u*ca), c*(v*sa-u*ca), c*(v*ca-u*sa)]) < 1e-9,cloud
             assert cloud['visible'] and cloud['size']==.25 and cloud['adaptive'] and cloud['circle'],cloud
         assert page.locator('#viewer-status').is_hidden()
         page.screenshot(path=f'/tmp/6735-{width}.png',full_page=True)
@@ -43,7 +47,7 @@ with sync_playwright() as p:
                 assert page.evaluate('(prefix)=>viewer.scene.pointclouds.filter(c=>c.visible).every(c=>c.name.startsWith(prefix))',prefix)
         assert page.evaluate('viewer.scene.pointclouds.length') == 31
         assert not errors and not failures,(errors,failures)
-        print(f'PASS: {width}px, 17 segments in one viewer, shared +45Y then +90X world rotation verified; 1/2/3/4 switching without duplicates',flush=True)
+        print(f'PASS: {width}px, 17 segments in one viewer, shared +45Y, +90X, -5Y world rotation verified; 1/2/3/4 switching without duplicates',flush=True)
         print('Rendered segment points:', {c['name']:c['points'] for c in state},flush=True)
         page.close()
     browser.close()

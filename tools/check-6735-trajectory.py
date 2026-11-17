@@ -23,7 +23,9 @@ for frame, camera in zip(data['frames'], cameras):
 def rotate(point):
     x, y, z = point
     c = math.sqrt(.5)
-    return [c * (x + z), c * (x - z), y]
+    a = c * (x + z)
+    angle = math.radians(-5)
+    return [math.cos(angle) * a + math.sin(angle) * y, c * (x - z), -math.sin(angle) * a + math.cos(angle) * y]
 
 positions = [rotate(f['position']) for f in data['frames']]
 length = sum(math.dist(a, b) for a, b in zip(positions, positions[1:]))
@@ -129,6 +131,6 @@ with sync_playwright() as p:
         assert all(math.dist(actual[k], expected[k]) < 1e-9 for k in expected)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert not errors and not failures, (errors, failures)
-        print(f'PASS: {width}px; 240 XML centres, path, middle/end playback, pause/resume/restart/exit, menu/route isolation, 4 m/s and level gaze; shared +45Y then +90X rotation on all 17 clouds and path', flush=True)
+        print(f'PASS: {width}px; 240 XML centres, path, middle/end playback, pause/resume/restart/exit, menu/route isolation, 4 m/s and level gaze; shared +45Y, +90X, -5Y rotation on all 17 clouds and path', flush=True)
         page.close()
     browser.close()
