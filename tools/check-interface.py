@@ -24,13 +24,14 @@ with sync_playwright() as p:
   assert page.locator('[data-person]').count()==4
   assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), 'horizontal overflow'
   page.screenshot(path=str(args.screenshots / f'start-menu-{width}.png'))
+  page.locator('.start-button').click()
   page.locator('[data-person="1"]').click()
   page.wait_for_function('window.viewer?.scene.pointclouds[0]?.numVisiblePoints > 0',timeout=45000)
   assert not page.locator('#start-menu').is_visible()
   assert not page.locator('#workspace').evaluate('(e)=>e.inert')
   assert page.locator('.potree_menu_toggle').count()==0
   settings=page.evaluate('''() => {const c=viewer.scene.pointclouds[0],m=c.material;return {size:m.size,adaptive:m.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:m.shape===Potree.PointShape.CIRCLE,background:viewer.background,edl:viewer.getEDLEnabled(),clouds:viewer.scene.pointclouds.length}}''')
-  assert settings==dict(size=.25,adaptive=True,circle=True,background='white',edl=False,clouds=1),settings
+  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=1),settings
   rect=page.locator('.viewer-frame').bounding_box();canvas=page.locator('#potree_render_area canvas').first.bounding_box()
   assert abs(rect['width']-canvas['width'])<3 and abs(rect['height']-canvas['height'])<3,(rect,canvas)
   page.screenshot(path=str(args.screenshots / f'pointcloud-ui-{width}.png'),full_page=True)

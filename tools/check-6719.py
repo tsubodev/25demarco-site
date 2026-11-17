@@ -19,6 +19,7 @@ with sync_playwright() as p:
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.on('response', lambda r: failures.append((r.status,r.url)) if r.status>=400 else None)
         page.goto(args.url)
+        page.locator('.start-button').click()
         page.locator('[data-person="3"]').click()
         page.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length === 12',timeout=45000)
         page.wait_for_function('viewer.scene.pointclouds.reduce((n,c)=>n+c.numVisiblePoints,0)>0',timeout=45000)

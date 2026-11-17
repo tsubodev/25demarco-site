@@ -1,3 +1,4 @@
+import { introduction, peopleContent } from './people.js';
 import { createReferenceAxes } from './reference-axes.js';
 import { GuidedRoute } from './guided-route.js';
 import { pointClouds as routes } from './point-clouds.js';
@@ -7,6 +8,9 @@ const startMenu = document.querySelector('#start-menu');
 const workspace = document.querySelector('#workspace');
 const people = [...document.querySelectorAll('[data-person]')];
 const firstPerson = people[0];
+const homeContent = document.querySelector('#home-content');
+const peopleMenu = document.querySelector('#people-menu');
+document.querySelector('#introduction').textContent = introduction;
 const status = document.querySelector('#viewer-status');
 const interactionButton = document.querySelector('#viewer-interaction');
 const viewerFrame = document.querySelector('.viewer-frame');
@@ -32,6 +36,7 @@ function syncReferenceAxes() {
 axesToggle.addEventListener('change', syncReferenceAxes);
 let selectedPerson = '1';
 let hasEntered = false;
+let menuExpanded = false;
 const clouds = new Map();
 
 function renderRoute() {
@@ -74,7 +79,22 @@ function openExperience(person) {
     if (button.dataset.person === person) button.setAttribute('aria-current', 'true');
     else button.removeAttribute('aria-current');
   });
-  document.querySelector('#person-heading span').textContent = `PUXADOR ${person}`;
+  const content = peopleContent[person];
+  document.querySelector('#person-heading span').textContent = `PUXADOR ${person} - ${content.name.toUpperCase()}`;
+  document.querySelector('#person-story').textContent = content.story;
+  const map = document.querySelector('#route-map');
+  map.src = content.map;
+  map.alt = `Mapa do percurso de ${content.name}`;
+  const photos = document.querySelector('.photo-column');
+  photos.replaceChildren(...content.photos.map((src, index) => {
+    const image = document.createElement('img');
+    image.src = src;
+    image.alt = `Registro ${index + 1} do percurso de ${content.name} na região da 25 de Março`;
+    image.width = 1008;
+    image.height = 693;
+    return image;
+  }));
+  document.querySelector('.story-panel').scrollTop = 0;
   setInteraction(false);
   renderRoute();
   setMenu(false);
@@ -84,16 +104,22 @@ function openExperience(person) {
 }
 
 function setMenu(open) {
+  menuExpanded = open;
   if (open) setInteraction(false);
-  document.body.classList.toggle('menu-open', open);
-  startMenu.hidden = !open;
-  tour?.setActive(!open && selectedPerson === '4' && Boolean(clouds.get('4')?.ready));
+  const welcome = !hasEntered;
+  document.body.classList.toggle('home-view', welcome);
+  document.body.classList.toggle('menu-open', open || welcome);
+  document.body.classList.toggle('menu-expanded', open);
+  startMenu.hidden = !(open || welcome);
+  peopleMenu.hidden = !open;
+  homeContent.hidden = !welcome;
+  homeContent.inert = open;
+  workspace.inert = open || welcome;
+  tour?.setActive(!open && hasEntered && selectedPerson === '4' && Boolean(clouds.get('4')?.ready));
   syncReferenceAxes();
-  workspace.inert = open;
   menuButton.setAttribute('aria-expanded', String(open));
   if (open) (document.querySelector('[aria-current="true"]') || firstPerson).focus();
   else menuButton.focus();
-  // Potree reads its container dimensions on each frame, including after a menu close.
   window.dispatchEvent(new Event('resize'));
 }
 
@@ -106,7 +132,7 @@ async function ensureViewer() {
       viewer.setEDLEnabled(false);
       viewer.setFOV(60);
       viewer.setPointBudget(1_000_000);
-      viewer.setBackground('white');
+      viewer.setBackground(null);
       viewer.setDescription('');
       referenceAxes = createReferenceAxes(three);
       viewer.scene.scene.add(referenceAxes);
@@ -175,12 +201,14 @@ async function loadViewer(person) {
 people.forEach(button => button.addEventListener('click', () => {
   openExperience(button.dataset.person);
 }));
-menuButton.addEventListener('click', () => {
-  if (startMenu.hidden) setMenu(true);
-  else openExperience(selectedPerson);
+menuButton.addEventListener('click', () => setMenu(!menuExpanded));
+document.querySelector('.start-button').addEventListener('click', () => setMenu(true));
+document.querySelector('#home-button').addEventListener('click', () => {
+  hasEntered = false;
+  setInteraction(false);
+  setMenu(false);
 });
 document.addEventListener('keydown', event => {
-  if (event.key !== 'Escape' || !hasEntered) return;
-  if (startMenu.hidden) setMenu(true);
-  else openExperience(selectedPerson);
+  if (event.key !== 'Escape') return;
+  if (menuExpanded || hasEntered) setMenu(!menuExpanded);
 });
