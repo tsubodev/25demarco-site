@@ -31,7 +31,7 @@ with sync_playwright() as p:
   assert not page.locator('#workspace').evaluate('(e)=>e.inert')
   assert page.locator('.potree_menu_toggle').count()==0
   settings=page.evaluate('''() => {const c=viewer.scene.pointclouds[0],m=c.material;return {size:m.size,adaptive:m.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:m.shape===Potree.PointShape.CIRCLE,background:viewer.background,edl:viewer.getEDLEnabled(),clouds:viewer.scene.pointclouds.length}}''')
-  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=22),settings
+  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=3),settings
   rect=page.locator('.viewer-frame').bounding_box();canvas=page.locator('#potree_render_area canvas').first.bounding_box()
   assert abs(rect['width']-canvas['width'])<3 and abs(rect['height']-canvas['height'])<3,(rect,canvas)
   page.screenshot(path=str(args.screenshots / f'pointcloud-ui-{width}.png'),full_page=True)
@@ -95,7 +95,7 @@ with sync_playwright() as p:
     assert len(visible) == 3
     assert all(name.startswith('6717 / ') for name in visible)
     assert page.locator('#viewer-status').is_hidden()
-   assert page.evaluate('viewer.scene.pointclouds.length') == 39
+   assert page.evaluate('viewer.scene.pointclouds.length') == 20
   print('PASS: Fusion 1 assignments, pending routes and cached clouds',width,flush=True)
   page.keyboard.press('Escape');assert page.locator('#start-menu').is_visible()
   page.keyboard.press('Escape');assert not page.locator('#start-menu').is_visible()

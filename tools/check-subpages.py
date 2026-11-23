@@ -55,6 +55,23 @@ with sync_playwright() as p:
             else:
                 expect(page.locator('#guided-route')).to_be_hidden()
 
+            if dataset['code'] == 'GPBK6717':
+                expect(page.locator('#tiago-moments')).to_be_visible()
+                expect(page.locator('#moment-description')).to_be_hidden()
+                expected_titles = ('Shopping Mix', 'Entrada da galeria', 'Quiosques e lojas', 'Primeira loja')
+                poses = set()
+                for moment, title in enumerate(expected_titles):
+                    page.locator(f'[data-moment="{moment}"]').click()
+                    expect(page.locator('#moment-title')).to_have_text(title)
+                    expect(page.locator('#moment-caption')).not_to_be_empty()
+                    assert page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).length') == 3
+                    poses.add(tuple(page.evaluate('viewer.scene.view.position.toArray()')))
+                assert len(poses) == 4
+                page.locator('[data-moment="overview"]').click()
+                expect(page.locator('#moment-description')).to_be_hidden()
+            else:
+                expect(page.locator('#tiago-moments')).to_be_hidden()
+
             if index < count:
                 next_page.click()
 
@@ -78,6 +95,24 @@ with sync_playwright() as p:
     direct.goto(args.url + '#puxador-1/pagina-2')
     expect(direct.locator('#page-indicator')).to_contain_text('GPBK6718 · 2 / 10')
     direct.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length === 7')
+    page.close()
+    direct.close()
+
+    # A missing descriptor for one dataset must leave other stages usable.
+    isolated = browser.new_page(viewport={'width': 1450, 'height': 1024})
+    affected_url = '**/pointclouds/6718/static/6718.1_converted/cloud.js'
+    isolate_failure = lambda route: route.fulfill(status=404, body='Missing descriptor')
+    isolated.route(affected_url, isolate_failure)
+    isolated.goto(args.url + '#puxador-1/pagina-1')
+    isolated.wait_for_function('window.viewer?.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)')
+    assert isolated.evaluate('viewer.scene.pointclouds.every(c=>c.userData.datasetCode==="GPBK6717")')
+    isolated.locator('#page-next').click()
+    expect(isolated.locator('#viewer-status')).to_contain_text('Não foi possível carregar a nuvem GPBK6718')
+    isolated.locator('#page-next').click()
+    isolated.wait_for_function('viewer.scene.pointclouds.some(c=>c.visible && c.userData.datasetCode==="GPBK6719" && c.numVisiblePoints>0)', timeout=45000)
+    isolated.unroute(affected_url, isolate_failure)
+    isolated.locator('#page-previous').click()
+    isolated.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible && c.userData.datasetCode==="GPBK6718").length===7')
     assert not errors, errors
-    print('PASS: 20 stages, linked clouds and maps, pending stages, guided tour, browser history and direct link')
+    print('PASS: 20 stages, linked clouds and maps, pending stages, guided tour, browser history, direct link and isolated 404/retry')
     browser.close()

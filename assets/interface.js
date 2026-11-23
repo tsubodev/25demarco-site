@@ -1,10 +1,11 @@
+import { guilhermeMoments } from './guilherme-moments.js';
 import { tiagoMoments } from './tiago-moments.js';
 import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
 import { introduction, peopleContent } from './people.js';
 import { createReferenceAxes } from './reference-axes.js';
 import { GuidedRoute } from './guided-route.js';
-import { pointClouds as routes } from './point-clouds.js';
+import { pointClouds as routes } from './point-clouds.js?v=fusion-1-cache-2';
 
 const menuButton = document.querySelector('.menu-button');
 const startMenu = document.querySelector('#start-menu');
@@ -34,7 +35,7 @@ let tour;
 let referenceAxes;
 const axesToggle = document.querySelector('#reference-axes-toggle');
 function syncReferenceAxes() {
-  if (referenceAxes) referenceAxes.visible = isGuidedDataset() && Boolean(clouds.get('4')?.ready) && startMenu.hidden && axesToggle.checked;
+  if (referenceAxes) referenceAxes.visible = isGuidedDataset() && Boolean(clouds.get(selectedDataset)?.ready) && startMenu.hidden && axesToggle.checked;
 }
 axesToggle.addEventListener('change', syncReferenceAxes);
 let selectedPerson = '1';
@@ -66,12 +67,12 @@ function showSubpage(index, writeHistory = true) {
   previousPage.disabled = index === 0;
   nextPage.disabled = index === count - 1;
   tour?.pause();
-  updateMomentSelection('overview');
+  setupMomentViews();
   renderRoute();
   if (dataset?.sources?.length) {
-    const record = clouds.get(selectedPerson);
-    if (record?.ready) frameSelectedClouds(selectedPerson, record);
-    else loadViewer(selectedPerson);
+    const record = clouds.get(selectedDataset);
+    if (record?.ready) frameSelectedClouds(record);
+    else loadViewer(dataset);
   }
   const hash = `#puxador-${selectedPerson}/pagina-${index + 1}`;
   if (writeHistory && location.hash !== hash) history.pushState(null, '', hash);
@@ -84,8 +85,10 @@ function visibleClouds(record) {
   return record.pointclouds.filter(cloud => cloud.visible);
 }
 
-function hasTiagoMoments(person) {
-  return person === '3' && selectedDataset === 'GPBK6719';
+function selectedMoments() {
+  if (selectedPerson === '1' && selectedDataset === 'GPBK6717') return guilhermeMoments;
+  if (selectedPerson === '3' && selectedDataset === 'GPBK6719') return tiagoMoments;
+  return null;
 }
 
 function isGuidedDataset() {
@@ -96,20 +99,23 @@ function isGuidedDataset() {
 const momentsPanel = document.querySelector('#tiago-moments');
 const momentViews = document.querySelector('#moment-views');
 const momentDescription = document.querySelector('#moment-description');
-for (const [index, moment] of tiagoMoments.entries()) {
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.dataset.moment = index;
-  button.textContent = `${index + 1}. ${moment.title}`;
-  button.setAttribute('aria-pressed', 'false');
-  momentViews.append(button);
+function setupMomentViews() {
+  momentViews.querySelectorAll('[data-moment]:not([data-moment="overview"])').forEach(button => button.remove());
+  for (const [index, moment] of (selectedMoments() ?? []).entries()) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.moment = index;
+    button.textContent = `${index + 1}. ${moment.title}`;
+    momentViews.append(button);
+  }
+  updateMomentSelection('overview');
 }
 
 function updateMomentSelection(selection) {
   for (const button of momentViews.querySelectorAll('button')) {
     button.setAttribute('aria-pressed', String(button.dataset.moment === selection));
   }
-  const moment = tiagoMoments[selection];
+  const moment = selectedMoments()?.[selection];
   momentDescription.hidden = !moment;
   if (moment) {
     document.querySelector('#moment-title').textContent = moment.title;
@@ -117,7 +123,7 @@ function updateMomentSelection(selection) {
   }
 }
 
-function frameTiagoOverview(pointclouds) {
+function frameMomentsOverview(pointclouds) {
   viewer.controls.stop();
   viewer.controls.stopTweens?.();
   const view = viewer.scene.view;
@@ -135,15 +141,16 @@ function frameTiagoOverview(pointclouds) {
 
 momentViews.addEventListener('click', event => {
   const button = event.target.closest('[data-moment]');
-  const record = clouds.get('3');
-  if (!button || !hasTiagoMoments(selectedPerson) || !record?.ready) return;
+  const record = clouds.get(selectedDataset);
+  const moments = selectedMoments();
+  if (!button || !moments || !record?.ready) return;
   const selection = button.dataset.moment;
   updateMomentSelection(selection);
   if (selection === 'overview') {
-    frameTiagoOverview(visibleClouds(record));
+    frameMomentsOverview(visibleClouds(record));
     return;
   }
-  const {position, target} = tiagoMoments[selection];
+  const {position, target} = moments[selection];
   viewer.controls.stop();
   viewer.controls.stopTweens?.();
   viewer.scene.view.position.set(...position);
@@ -151,10 +158,9 @@ momentViews.addEventListener('click', event => {
 });
 
 function syncCloudVisibility() {
-  for (const [person, entry] of clouds) {
+  for (const [code, entry] of clouds) {
     for (const cloud of entry.pointclouds || []) {
-      cloud.visible = person === selectedPerson && entry.ready
-        && cloud.userData.datasetCode === selectedDataset;
+      cloud.visible = code === selectedDataset && entry.ready;
     }
   }
 }
@@ -162,9 +168,9 @@ function syncCloudVisibility() {
 function renderRoute() {
   const dataset = routes[selectedPerson][currentPages.get(selectedPerson)];
   const available = Boolean(dataset?.sources?.length);
-  const record = clouds.get(selectedPerson);
+  const record = clouds.get(selectedDataset);
   const loaded = available && Boolean(record?.ready);
-  momentsPanel.hidden = !hasTiagoMoments(selectedPerson) || !loaded;
+  momentsPanel.hidden = !selectedMoments() || !loaded;
   viewerFrame.classList.toggle('route-pending', !available);
   syncCloudVisibility();
   tour?.setActive(isGuidedDataset() && loaded && startMenu.hidden);
@@ -174,7 +180,7 @@ function renderRoute() {
   status.textContent = !available
     ? dataset ? `Nuvem ${dataset.code} aguardando importação.` : 'Esta etapa ainda não tem uma nuvem associada.'
     : record?.error
-      ? 'Não foi possível carregar o percurso. Atualize a página para tentar novamente.'
+      ? `Não foi possível carregar a nuvem ${dataset.code}. Volte a esta etapa para tentar novamente.`
       : 'Carregando o percurso…';
 }
 
@@ -193,9 +199,9 @@ function frameCloud(pointclouds) {
   viewer.controls.stop();
 }
 
-function frameSelectedClouds(person, record) {
+function frameSelectedClouds(record) {
   const pointclouds = visibleClouds(record);
-  if (hasTiagoMoments(person)) frameTiagoOverview(pointclouds);
+  if (selectedMoments()) frameMomentsOverview(pointclouds);
   else if (pointclouds.length) frameCloud(pointclouds);
 }
 
@@ -236,7 +242,7 @@ function setMenu(open) {
   homeContent.hidden = !welcome;
   homeContent.inert = open;
   workspace.inert = open || welcome;
-  tour?.setActive(!open && hasEntered && isGuidedDataset() && Boolean(clouds.get('4')?.ready));
+  tour?.setActive(!open && hasEntered && isGuidedDataset() && Boolean(clouds.get(selectedDataset)?.ready));
   syncReferenceAxes();
   menuButton.setAttribute('aria-expanded', String(open));
   if (open) (document.querySelector('[aria-current="true"]') || firstPerson).focus();
@@ -271,27 +277,24 @@ async function ensureViewer() {
       const guidedDataset = routes['4'].find(dataset => dataset.trajectory && dataset.sources?.length);
       if (guidedDataset) {
         tour = new GuidedRoute(viewer, three, guidedDataset.trajectory,
-          () => frameCloud(visibleClouds(clouds.get('4'))), displayTransformFor(guidedDataset));
+          () => frameCloud(visibleClouds(clouds.get(guidedDataset.code))), displayTransformFor(guidedDataset));
       }
     })();
   }
   return viewerReady;
 }
 
-async function loadViewer(person) {
-  if (clouds.has(person)) return clouds.get(person).promise;
-  const route = routes[person];
+function loadViewer(dataset) {
+  const {code, sources} = dataset;
+  const existing = clouds.get(code);
+  if (existing && !existing.error) return existing.promise;
   const record = {};
-  clouds.set(person, record);
+  clouds.set(code, record);
   record.promise = (async () => {
     renderRoute();
     try {
       await ensureViewer();
-      const sources = route.flatMap(dataset => {
-        if (!dataset.sources?.length) return [];
-        const transform = displayTransformFor(dataset);
-        return dataset.sources.map(source => ({...source, transform, datasetCode: dataset.code}));
-      });
+      const transform = displayTransformFor(dataset);
       const pointclouds = await Promise.all(sources.map(async source => {
         const response = await fetch(source.url);
         if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
@@ -301,14 +304,14 @@ async function loadViewer(person) {
           new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Tempo de carregamento excedido')), 45000); }),
         ]).finally(() => clearTimeout(timeout));
         pointcloud.name = source.name;
-        pointcloud.userData.datasetCode = source.datasetCode;
+        pointcloud.userData.datasetCode = code;
         const material = pointcloud.material;
         material.size = 0.25;
         material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
         material.shape = Potree.PointShape.CIRCLE;
         material.activeAttributeName = 'rgba';
         // Apply one world-origin rotation to every segment; source coordinates stay intact.
-        pointcloud.applyMatrix4(source.transform);
+        pointcloud.applyMatrix4(transform);
         pointcloud.visible = false;
         return pointcloud;
       }));
@@ -317,11 +320,11 @@ async function loadViewer(person) {
       for (const pointcloud of pointclouds) viewer.scene.addPointCloud(pointcloud);
       renderRoute();
       // A previous download completing must not replace the current page's camera.
-      if (selectedPerson === person && hasEntered) {
-        frameSelectedClouds(person, record);
+      if (selectedDataset === code && hasEntered) {
+        frameSelectedClouds(record);
       }
     } catch (error) {
-      console.error(`Não foi possível carregar o percurso ${person}:`, error);
+      console.error(`Não foi possível carregar a nuvem ${code}:`, error);
       record.error = true;
       renderRoute();
     }
