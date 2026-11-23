@@ -31,7 +31,7 @@ with sync_playwright() as p:
   assert not page.locator('#workspace').evaluate('(e)=>e.inert')
   assert page.locator('.potree_menu_toggle').count()==0
   settings=page.evaluate('''() => {const c=viewer.scene.pointclouds[0],m=c.material;return {size:m.size,adaptive:m.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:m.shape===Potree.PointShape.CIRCLE,background:viewer.background,edl:viewer.getEDLEnabled(),clouds:viewer.scene.pointclouds.length}}''')
-  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=16),settings
+  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=22),settings
   rect=page.locator('.viewer-frame').bounding_box();canvas=page.locator('#potree_render_area canvas').first.bounding_box()
   assert abs(rect['width']-canvas['width'])<3 and abs(rect['height']-canvas['height'])<3,(rect,canvas)
   page.screenshot(path=str(args.screenshots / f'pointcloud-ui-{width}.png'),full_page=True)
@@ -70,6 +70,8 @@ with sync_playwright() as p:
   page.locator('.menu-button').click()
   assert page.locator('#start-menu').is_visible()
   page.locator('[data-person="4"]').click()
+  for _ in range(2):
+      page.locator('#page-next').click()
   assert page.locator('#person-heading').inner_text().startswith('PUXADOR 4')
   page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).length === 17',timeout=45000)
   page.wait_for_function('viewer.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints > 0)',timeout=45000)
@@ -93,7 +95,7 @@ with sync_playwright() as p:
     assert len(visible) == 3
     assert all(name.startswith('6717 / ') for name in visible)
     assert page.locator('#viewer-status').is_hidden()
-   assert page.evaluate('viewer.scene.pointclouds.length') == 33
+   assert page.evaluate('viewer.scene.pointclouds.length') == 39
   print('PASS: Fusion 1 assignments, pending routes and cached clouds',width,flush=True)
   page.keyboard.press('Escape');assert page.locator('#start-menu').is_visible()
   page.keyboard.press('Escape');assert not page.locator('#start-menu').is_visible()

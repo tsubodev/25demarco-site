@@ -42,6 +42,8 @@ with sync_playwright() as p:
         page.locator('.start-button').click()
         assert page.locator('#guided-route').is_hidden()
         page.locator('[data-person="4"]').click()
+        for _ in range(2):
+            page.locator('#page-next').click()
         page.locator('#tour-options summary').click()
         page.wait_for_function('!document.querySelector("#tour-play").disabled', timeout=45000)
         page.wait_for_function('viewer.scene.pointclouds.some(c=>c.numVisiblePoints>0)', timeout=45000)

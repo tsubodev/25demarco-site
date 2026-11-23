@@ -102,7 +102,4 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 #moment-caption { margin: 0; font-size: clamp(13px, 1vw, 16px); line-height: 1.5; }
 
 .menu-open .moments-panel { visibility: hidden; }
-
-.dataset-picker { display: flex; align-items: center; gap: 10px; padding: 12px 20px; font-size: 14px; }
-.dataset-picker select { color: inherit; background: var(--purple); border: 1px solid #f2f1a466; font: inherit; padding: 6px 10px; }
-.menu-open .dataset-picker { visibility: hidden; }
+.viewer-frame.route-pending #potree_render_area { visibility: hidden; }

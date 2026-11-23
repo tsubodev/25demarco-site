@@ -22,6 +22,8 @@ with sync_playwright() as p:
         page.goto(args.url)
         page.locator('.start-button').click()
         page.locator('[data-person="4"]').click()
+        for _ in range(2):
+            page.locator('#page-next').click()
         page.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length === 17',timeout=45000)
         page.wait_for_function('viewer.scene.pointclouds.reduce((n,c)=>n+c.numVisiblePoints,0)>0',timeout=45000)
         page.wait_for_timeout(1500)
@@ -48,7 +50,7 @@ with sync_playwright() as p:
                 assert names == ['6717 / 6717.11', '6717 / 6717.12', '6717 / 6717.2']
             if person == '4':
                 assert all(n.startswith('6735 / ') for n in names)
-        assert page.evaluate('viewer.scene.pointclouds.length') == 33
+        assert page.evaluate('viewer.scene.pointclouds.length') == 39
         assert not errors and not failures,(errors,failures)
         print(f'PASS: {width}px, 17 segments in one viewer, shared +45Y, +90X, -5Y world rotation verified; 1/2/3/4 switching without duplicates',flush=True)
         print('Rendered segment points:', {c['name']:c['points'] for c in state},flush=True)

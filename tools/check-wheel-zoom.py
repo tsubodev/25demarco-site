@@ -14,6 +14,9 @@ with sync_playwright() as p:
     page.locator('.start-button').click()
     for person in ('1','4'):
         page.locator(f'[data-person="{person}"]').click()
+        if person == '4':
+            for _ in range(2):
+                page.locator('#page-next').click()
         page.wait_for_function('window.viewer?.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
         box = page.locator('#potree_render_area canvas').first.bounding_box()
         page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.6)

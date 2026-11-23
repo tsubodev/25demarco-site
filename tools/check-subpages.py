@@ -1,78 +1,83 @@
-"""Check PDF subpages, independent per-person state and shared 3D scenes."""
+"""Check the Fusion 1 stage order, linked maps and clouds, and browser history."""
 import argparse
-from playwright.sync_api import sync_playwright
+import json
+from pathlib import Path
+
+from playwright.sync_api import expect, sync_playwright
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--url', default='http://127.0.0.1:8000/')
 args = parser.parse_args()
+root = Path(__file__).resolve().parents[1]
+catalog = json.loads((root / 'assets/cloud-catalog.json').read_text())
+
 with sync_playwright() as p:
-    browser = p.chromium.launch(executable_path='/usr/bin/chromium', args=['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'])
-    for width, height in ((1450, 1024), (390, 844)):
-        page = browser.new_page(viewport={'width': width, 'height': height}, is_mobile=width < 700, has_touch=width < 700)
-        errors, failures = [], []
-        page.on('pageerror', lambda e: errors.append(str(e)))
-        page.on('response', lambda r: failures.append((r.status, r.url)) if r.status >= 400 else None)
-        page.goto(args.url)
-        page.locator('.start-button').click()
-        for person, count, clouds in (('1', 9, 3), ('2', 3, 0), ('3', 2, 0), ('4', 6, 17)):
-            page.locator(f'[data-person="{person}"]').click()
-            page.wait_for_function('(n)=>viewer.scene.pointclouds.filter(c=>c.visible).length===n', arg=clouds, timeout=45000)
-            if clouds:
-                page.wait_for_function('viewer.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
-            page.wait_for_timeout(400)
-            matrices = page.evaluate('viewer.scene.pointclouds.map(c=>c.matrix.toArray())')
-            view = page.evaluate('viewer.scene.view.position.toArray()')
-            loaded = page.evaluate('viewer.scene.pointclouds.length')
-            assert page.locator('#page-previous').is_disabled()
-            urls = []
-            for index in range(count):
-                assert page.locator('#page-indicator').inner_text().endswith(f'{index+1} / {count}')
-                assert page.url.endswith(f'#puxador-{person}/pagina-{index+1}')
-                page.wait_for_function('document.querySelector("#route-map").complete && document.querySelector("#route-map").naturalWidth>0')
-                urls.append(page.locator('#route-map').get_attribute('src'))
-                if person == '4' and index in (0, count - 1):
-                    page.screenshot(path=f'/tmp/subpages-benne-{index+1}-{width}.png', full_page=True)
-                if index < count - 1:
-                    page.locator('#page-next').click()
-            assert len(set(urls)) == count
-            assert page.locator('#page-next').is_disabled()
-            assert page.evaluate('viewer.scene.pointclouds.length') == loaded
-            assert page.evaluate('viewer.scene.pointclouds.map(c=>c.matrix.toArray())') == matrices
-            assert page.evaluate('viewer.scene.view.position.toArray()') == view
-            page.locator('#page-previous').click()
-            assert page.locator('#page-indicator').inner_text().endswith(f'{count-1} / {count}')
-            page.go_back()
-            page.wait_for_function('(s)=>document.querySelector("#page-indicator").textContent.endsWith(s)', arg=f'{count} / {count}')
-            page.go_forward()
-            page.wait_for_function('(s)=>document.querySelector("#page-indicator").textContent.endsWith(s)', arg=f'{count-1} / {count}')
-            if person == '4':
-                page.locator('#tour-options summary').click()
-                page.locator('#tour-play').click()
-                page.wait_for_function('document.querySelector("#tour-progress").value>.003')
-                page.locator('#page-next').click()
-                progress = page.locator('#tour-progress').evaluate('(e)=>e.value')
-                page.wait_for_timeout(250)
-                assert page.locator('#tour-progress').evaluate('(e)=>e.value') == progress
-                assert page.locator('#tour-pause').is_disabled()
-                page.locator('#page-previous').click()
-            page.locator('.menu-button').click()
-        # Reopening remembers Benne's selected subpage and keeps only 17 visible clouds.
-        page.locator('[data-person="4"]').click()
-        assert page.locator('#page-indicator').inner_text().endswith('5 / 6')
-        assert page.evaluate('viewer.scene.pointclouds.length') == 33
-        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
-        assert not errors and not failures, (errors, failures)
-        page.close()
-        direct = browser.new_page(viewport={'width': width, 'height': height})
-        direct.goto(args.url + '#puxador-3/pagina-1')
-        assert 'GPBK6732' in direct.locator('#viewer-status').inner_text()
-        assert direct.locator('#tiago-moments').is_hidden()
-        assert direct.evaluate('!window.viewer')
-        direct.goto(args.url + '#puxador-4/pagina-6')
-        direct.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length===17', timeout=45000)
-        assert direct.locator('#page-indicator').inner_text().endswith('6 / 6')
-        assert direct.locator('#start-menu').is_hidden()
-        assert direct.locator('#page-next').is_disabled()
-        direct.close()
-        print(f'PASS: {width}px; 20 subpages, limits, maps, browser history, saved page, direct link; no cloud reload or view changes', flush=True)
+    browser = p.chromium.launch(executable_path='/usr/bin/chromium', args=[
+        '--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
+    ])
+    page = browser.new_page(viewport={'width': 1450, 'height': 1024})
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.on('response', lambda response: errors.append(response.url) if response.status >= 400 else None)
+    page.goto(args.url)
+    page.locator('.start-button').click()
+    indicator = page.locator('#page-indicator')
+    next_page = page.locator('#page-next')
+    previous_page = page.locator('#page-previous')
+
+    for person, count, maps in (('1', 10, 9), ('2', 5, 3), ('3', 1, 1), ('4', 4, 4)):
+        page.locator(f'[data-person="{person}"]').click()
+        expect(previous_page).to_be_disabled()
+        for index, dataset in enumerate(catalog[person], start=1):
+            expect(indicator).to_contain_text(f'{dataset["code"]} · {index} / {count}')
+            assert page.url.endswith(f'#puxador-{person}/pagina-{index}')
+            map_image = page.locator('#route-map')
+            if index <= maps:
+                expect(map_image).to_be_visible()
+                page.wait_for_function('document.querySelector("#route-map").naturalWidth > 0')
+            else:
+                expect(map_image).to_be_hidden()
+
+            sources = dataset.get('sources', [])
+            if sources:
+                page.wait_for_function(
+                    '(code)=>window.viewer?.scene.pointclouds.some(c=>c.visible && c.userData.datasetCode===code && c.numVisiblePoints>0)',
+                    arg=dataset['code'], timeout=45000,
+                )
+                visible = page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).map(c=>c.name)')
+                assert visible == [source['name'] for source in sources]
+                expect(page.locator('#viewer-status')).to_be_hidden()
+            else:
+                expect(page.locator('#viewer-status')).to_contain_text(f'{dataset["code"]} aguardando importação')
+                assert page.evaluate('!window.viewer || viewer.scene.pointclouds.every(c=>!c.visible)')
+            if dataset['code'] == 'GPBK6735':
+                expect(page.locator('#guided-route')).to_be_visible()
+            else:
+                expect(page.locator('#guided-route')).to_be_hidden()
+
+            if index < count:
+                next_page.click()
+
+        expect(next_page).to_be_disabled()
+        page.locator('.menu-button').click()
+
+    # Re-enter at the last stage, then verify history switches both ways.
+    page.locator('[data-person="4"]').click()
+    expect(indicator).to_contain_text('GPBK6736 · 4 / 4')
+    previous_page.click()
+    expect(indicator).to_contain_text('GPBK6735 · 3 / 4')
+    expect(page.locator('#guided-route')).to_be_visible()
+    page.go_back()
+    expect(indicator).to_contain_text('GPBK6736 · 4 / 4')
+    expect(page.locator('#guided-route')).to_be_hidden()
+    page.go_forward()
+    expect(indicator).to_contain_text('GPBK6735 · 3 / 4')
+    assert page.evaluate('viewer.scene.pointclouds.length') == 39
+
+    direct = browser.new_page(viewport={'width': 1450, 'height': 1024})
+    direct.goto(args.url + '#puxador-1/pagina-2')
+    expect(direct.locator('#page-indicator')).to_contain_text('GPBK6718 · 2 / 10')
+    direct.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length === 7')
+    assert not errors, errors
+    print('PASS: 20 stages, linked clouds and maps, pending stages, guided tour, browser history and direct link')
     browser.close()

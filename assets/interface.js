@@ -45,35 +45,40 @@ const currentPages = new Map();
 const previousPage = document.querySelector('#page-previous');
 const nextPage = document.querySelector('#page-next');
 
+let selectedDataset;
+
 function showSubpage(index, writeHistory = true) {
-  const pages = routePages[selectedPerson];
-  index = Math.max(0, Math.min(pages.length - 1, index));
+  const count = routes[selectedPerson].length;
+  index = Math.max(0, Math.min(count - 1, index));
   currentPages.set(selectedPerson, index);
-  const content = peopleContent[selectedPerson];
+  const dataset = routes[selectedPerson][index];
+  const mapPage = routePages[selectedPerson][index];
+  selectedDataset = dataset?.code;
+  const {name} = peopleContent[selectedPerson];
   const map = document.querySelector('#route-map');
-  map.src = pages[index].map;
-  map.alt = `Mapa do percurso de ${content.name}, página ${index + 1} de ${pages.length}`;
-  document.querySelector('#page-indicator').textContent = `${content.name} · ${index + 1} / ${pages.length}`;
+  map.hidden = !mapPage;
+  if (mapPage) {
+    map.src = mapPage.map;
+    map.alt = `Mapa do percurso de ${name}, página ${index + 1} de ${count}`;
+  }
+  const label = dataset ? ` · ${dataset.code}` : '';
+  document.querySelector('#page-indicator').textContent = `${name}${label} · ${index + 1} / ${count}`;
   previousPage.disabled = index === 0;
-  nextPage.disabled = index === pages.length - 1;
-  // Page changes do not reposition or reload any point cloud or the free view.
+  nextPage.disabled = index === count - 1;
   tour?.pause();
+  updateMomentSelection('overview');
+  renderRoute();
+  if (dataset?.sources?.length) {
+    const record = clouds.get(selectedPerson);
+    if (record?.ready) frameSelectedClouds(selectedPerson, record);
+    else loadViewer(selectedPerson);
+  }
   const hash = `#puxador-${selectedPerson}/pagina-${index + 1}`;
   if (writeHistory && location.hash !== hash) history.pushState(null, '', hash);
 }
+
 previousPage.addEventListener('click', () => showSubpage(currentPages.get(selectedPerson) - 1));
 nextPage.addEventListener('click', () => showSubpage(currentPages.get(selectedPerson) + 1));
-
-const datasetPicker = document.querySelector('#dataset-picker');
-const datasetSelect = document.querySelector('#dataset-select');
-let selectedDataset;
-
-function setupDatasetPicker(person) {
-  const available = routes[person].filter(dataset => dataset.sources?.length);
-  selectedDataset = available[0]?.code;
-  datasetSelect.replaceChildren(...available.map(({code}) => new Option(code, code)));
-  datasetPicker.hidden = available.length < 2;
-}
 
 function visibleClouds(record) {
   return record.pointclouds.filter(cloud => cloud.visible);
@@ -87,14 +92,6 @@ function isGuidedDataset() {
   return selectedPerson === '4' && routes['4'].some(dataset =>
     dataset.code === selectedDataset && dataset.trajectory);
 }
-
-datasetSelect.addEventListener('change', () => {
-  selectedDataset = datasetSelect.value;
-  updateMomentSelection('overview');
-  renderRoute();
-  const record = clouds.get(selectedPerson);
-  if (record?.ready) frameSelectedClouds(selectedPerson, record);
-});
 
 const momentsPanel = document.querySelector('#tiago-moments');
 const momentViews = document.querySelector('#moment-views');
@@ -163,11 +160,11 @@ function syncCloudVisibility() {
 }
 
 function renderRoute() {
-  const available = routes[selectedPerson].some(dataset => dataset.sources?.length);
+  const dataset = routes[selectedPerson][currentPages.get(selectedPerson)];
+  const available = Boolean(dataset?.sources?.length);
   const record = clouds.get(selectedPerson);
-  const loaded = Boolean(record?.ready);
+  const loaded = available && Boolean(record?.ready);
   momentsPanel.hidden = !hasTiagoMoments(selectedPerson) || !loaded;
-  datasetSelect.disabled = !loaded;
   viewerFrame.classList.toggle('route-pending', !available);
   syncCloudVisibility();
   tour?.setActive(isGuidedDataset() && loaded && startMenu.hidden);
@@ -175,7 +172,7 @@ function renderRoute() {
   interactionButton.hidden = !loaded;
   status.hidden = loaded;
   status.textContent = !available
-    ? `Nuvens aguardando importação: ${routes[selectedPerson].map(dataset => dataset.code).join(', ')}.`
+    ? dataset ? `Nuvem ${dataset.code} aguardando importação.` : 'Esta etapa ainda não tem uma nuvem associada.'
     : record?.error
       ? 'Não foi possível carregar o percurso. Atualize a página para tentar novamente.'
       : 'Carregando o percurso…';
@@ -204,8 +201,6 @@ function frameSelectedClouds(person, record) {
 
 function openExperience(person, page = currentPages.get(person) ?? 0, writeHistory = true) {
   selectedPerson = person;
-  setupDatasetPicker(person);
-  updateMomentSelection('overview');
   hasEntered = true;
   people.forEach(button => {
     if (button.dataset.person === person) button.setAttribute('aria-current', 'true');
@@ -226,11 +221,7 @@ function openExperience(person, page = currentPages.get(person) ?? 0, writeHisto
   }));
   document.querySelector('.story-panel').scrollTop = 0;
   setInteraction(false);
-  renderRoute();
   setMenu(false);
-  const record = clouds.get(person);
-  if (record?.ready) frameSelectedClouds(person, record);
-  else if (routes[person].some(dataset => dataset.sources?.length)) loadViewer(person);
 }
 
 function setMenu(open) {
@@ -365,7 +356,7 @@ function restoreLocation() {
     return;
   }
   const person = match[1];
-  const page = Math.min(Number(match[2]) - 1, routePages[person].length - 1);
+  const page = Math.min(Number(match[2]) - 1, routes[person].length - 1);
   if (hasEntered && selectedPerson === person) {
     if (currentPages.get(person) !== page) showSubpage(page, false);
     if (menuExpanded) setMenu(false);

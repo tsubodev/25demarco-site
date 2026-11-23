@@ -2,7 +2,7 @@
 
 Instalação estática do [Potree oficial](https://github.com/potree/potree), tag `1.8.2`, commit `3013577379b5c8530ebca3cdc980f7585ae2320f`.
 
-`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base; a cópia `6716-static-v2` foi preparada a partir do arquivo original `6716-cloud` e está sem associação na planilha atual. A nuvem `25 de março` e o arquivo original `6716-cloud` permanecem preservados em `pointclouds/`. As nuvens de demonstração foram removidas.
+`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base. Os conjuntos da planilha ficam em `pointclouds/`, organizados por código.
 
 ## Executar
 
@@ -12,7 +12,7 @@ Na raiz do repositório:
 python3 -m http.server 8000
 ```
 
-A nuvem 6716 usa arquivos individuais, sem precisar de suporte HTTP Range. Para regenerar a cópia de exibição, execute `python3 tools/prepare-6716.py`. O script preserva os 211.969 pontos, exporta posições e RGB e verifica a contagem e o erro máximo de posição (0,00000005 unidade). Os atributos originais permanecem intactos em `6716-cloud`. As nuvens no formato Potree 2.0 precisam de um servidor compatível com Range.
+As cópias estáticas usam arquivos individuais e dispensam suporte a requisições HTTP Range. Os originais em Potree 2.0 continuam preservados.
 
 ## Reproduzir os arquivos oficiais
 
@@ -46,24 +46,24 @@ O catálogo [Fusion 1](assets/cloud-catalog.json) registra a ordem das colunas d
 
 | Puxador | Disponíveis | Aguardando importação, na ordem da planilha |
 | --- | --- | --- |
-| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718, GPBK6719 (12 trechos) | GPBK6720 a GPBK6726 |
+| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718 (7 trechos), GPBK6719 (12 trechos) | GPBK6720 a GPBK6726 |
 | 2 · Emily | — | GPBK627, GPBK6728, GPBK6729, GB016730, GPBK6730 |
 | 3 · Thiago | — | GPBK6732 |
 | 4 · Benny (Benne no site) | GPBK6735 (17 trechos) | GPBK6733, GPBK6734, GPBK6736 |
 
-Ao importar uma nuvem, prepare a cópia estática em uma pasta própria e preencha `sources` no item correspondente com objetos `{ "url": "pointclouds/.../cloud.js", "name": "..." }`. O caminho deve apontar para um descritor existente. O empacotamento inclui as pastas desses descritores. Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. O conjunto 6716 fica arquivado. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
+Ao importar uma nuvem, prepare a cópia estática em uma pasta própria e preencha `sources` no item correspondente com objetos `{ "url": "pointclouds/.../cloud.js", "name": "..." }`. O caminho deve apontar para um descritor existente. O empacotamento inclui as pastas desses descritores. Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
 
 Para preparar novos datasets no mesmo formato estático, preservando os originais:
 
 ```sh
-python3 tools/prepare_point_cloud.py pointclouds/6718-cloud pointclouds/6718-static
+python3 tools/prepare_point_cloud.py pointclouds/6718/original/6718.1_converted pointclouds/6718/static/6718.1_converted
 ```
 
-A nuvem 6718 contém 490.330 pontos. As configurações ADAPTIVE, CIRCLE, 0.25, fundo branco e EDL desligado se aplicam a todos os percursos. As nuvens são carregadas sob demanda e mantidas em cache; retornar a uma página não duplica seu point cloud. O enquadramento usa apenas o percurso selecionado.
+As configurações ADAPTIVE, CIRCLE, 0.25 e EDL desligado se aplicam a todos os percursos. As nuvens são carregadas sob demanda e mantidas em cache; retornar a uma página não duplica seu point cloud. O enquadramento usa apenas o percurso selecionado.
 
 ## Conjunto 6717
 
-Os três trechos da GPBK6717 ficam em `pointclouds/6717/original/`, com cópias para exibição em `pointclouds/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. O seletor **Nuvem** permite alternar entre 6717, 6718 e 6719 no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
+Os três trechos da GPBK6717 ficam em `pointclouds/6717/original/`, com cópias para exibição em `pointclouds/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. A barra **Anterior / Próxima** permite alternar entre 6717, 6718 e 6719 no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
 
 Para regenerar as cópias estáticas:
 
@@ -73,11 +73,15 @@ for segment in 6717.11_converted 6717.12_converted 6717.2_converted; do
 done
 ```
 
+## Conjunto 6718
+
+A GPBK6718 é composta por sete trechos e soma 5.790.014 pontos. Os originais ficam em `pointclouds/6718/original/`, e as cópias para exibição, em `pointclouds/6718/static/`. Na segunda etapa de Guilherme, os sete trechos são exibidos juntos no Puxador 1.
+
 ## Conjunto 6719
 
 Os 12 diretórios recebidos foram movidos de `6719/` para `pointclouds/6719/original/`, sem editar seu conteúdo. A cópia para exibição fica em `pointclouds/6719/static/`; são **11.321.028 pontos** no total.
 
-Todos os trechos são carregados juntos no PUXADOR 1 (Guilherme), ao lado da 6718, quando a GPBK6719 está selecionada no visualizador Potree. As coordenadas e os offsets de origem de cada trecho são preservados; não há translação dos point clouds para zero, troca de eixos ou mudança de escala. O enquadramento existente considera o conjunto selecionado, sem alterar a origem dos dados.
+Todos os trechos são carregados juntos no PUXADOR 1 (Guilherme) quando a GPBK6719 está selecionada no visualizador Potree. As coordenadas e os offsets de origem de cada trecho são preservados; não há translação dos point clouds para zero, troca de eixos ou mudança de escala. O enquadramento existente considera o conjunto selecionado, sem alterar a origem dos dados.
 
 Para reproduzir os arquivos de exibição:
 
@@ -144,13 +148,11 @@ A velocidade de apresentação foi duplicada de 2 para **4 m/s**. O percurso de 
 
 Durante a visita guiada, inclusive na transição de retorno, a câmera mantém inclinação vertical zero (`view.pitch = 0` no referencial Z vertical do Potree). O alvo do olhar fica na mesma altura da câmera; a direção horizontal acompanha as curvas do percurso. A câmera continua seguindo todas as posições 3D da trajetória, inclusive suas variações de altura. Pausar ou sair permite voltar a inclinar livremente a vista. O bloqueio não muda nuvens, rotação do conjunto ou coordenadas do percurso.
 
-## Subpáginas dos puxadores — amostra
+## Etapas dos puxadores
 
-Após escolher um puxador, a barra sobre a nuvem oferece **Anterior**, contador e **Próxima**. O cadastro `assets/route-pages.js` representa as páginas do PDF: Guilherme 3–11 (9 subpáginas), Emily 12–14 (3), Tiago 15–16 (2) e Benne 17–22 (6). Cada página possui o mapa correspondente, com a posição luminosa original da referência. Relatos e fotografias são compartilhados dentro do mesmo puxador, como no PDF.
+A barra **Anterior / Próxima** segue as posições do catálogo Fusion 1. O Puxador 1 tem 10 etapas, Emily tem 5, Thiago tem 1 e Benne tem 4. Cada etapa abre apenas a nuvem correspondente. Os trechos de uma mesma nuvem são exibidos juntos e as associações pendentes mostram o código que aguarda importação. A visita guiada de Benne está na etapa 3, junto com a GPBK6735.
 
-As subpáginas mantêm a nuvem e a vista atual, sem duplicar objetos, alterar transformações ou inventar posições 3D para cada mapa. Mudar de subpágina pausa uma visita guiada em andamento. A última página escolhida é lembrada ao reabrir um puxador na mesma sessão. Links como `#puxador-4/pagina-6` abrem diretamente a subpágina; voltar/avançar do navegador também restaura a seleção.
-
-Para verificar navegação, limites, mapas, links diretos, histórico e preservação da cena:
+Os mapas de `assets/route-pages.js` acompanham as etapas pela posição na lista. Uma etapa sem mapa mostra o relato e as fotos. As referências do PDF que excedem a quantidade de etapas ficam disponíveis nos arquivos para uso futuro. Links como `#puxador-4/pagina-3` abrem diretamente uma etapa. Voltar e avançar no navegador também restaura a nuvem e o mapa correspondentes.
 
 ```sh
 python3 tools/check-subpages.py --url http://127.0.0.1:8000/
