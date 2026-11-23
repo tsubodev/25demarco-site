@@ -1,3 +1,4 @@
+import { tiagoMoments } from './tiago-moments.js';
 import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
 import { introduction, peopleContent } from './people.js';
@@ -63,10 +64,68 @@ function showSubpage(index, writeHistory = true) {
 previousPage.addEventListener('click', () => showSubpage(currentPages.get(selectedPerson) - 1));
 nextPage.addEventListener('click', () => showSubpage(currentPages.get(selectedPerson) + 1));
 
+const momentsPanel = document.querySelector('#tiago-moments');
+const momentViews = document.querySelector('#moment-views');
+const momentDescription = document.querySelector('#moment-description');
+for (const [index, moment] of tiagoMoments.entries()) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.dataset.moment = index;
+  button.textContent = `${index + 1}. ${moment.title}`;
+  button.setAttribute('aria-pressed', 'false');
+  momentViews.append(button);
+}
+
+function updateMomentSelection(selection) {
+  for (const button of momentViews.querySelectorAll('button')) {
+    button.setAttribute('aria-pressed', String(button.dataset.moment === selection));
+  }
+  const moment = tiagoMoments[selection];
+  momentDescription.hidden = !moment;
+  if (moment) {
+    document.querySelector('#moment-title').textContent = moment.title;
+    document.querySelector('#moment-caption').textContent = moment.caption;
+  }
+}
+
+function frameTiagoOverview(pointclouds) {
+  viewer.controls.stop();
+  viewer.controls.stopTweens?.();
+  const view = viewer.scene.view;
+  // Use Potree's initial orientation and fit the current canvas after hiding the caption.
+  view.yaw = Math.PI / 4;
+  view.pitch = -Math.PI / 4;
+  const sphere = viewer.getBoundingBox(pointclouds).getBoundingSphere(new three.Sphere());
+  const aspect = viewerFrame.clientWidth / Math.max(1, viewerFrame.clientHeight);
+  const verticalHalfFov = viewer.scene.cameraP.fov * Math.PI / 360;
+  const horizontalHalfFov = Math.atan(Math.tan(verticalHalfFov) * aspect);
+  const distance = sphere.radius / Math.sin(Math.min(verticalHalfFov, horizontalHalfFov));
+  view.position.copy(sphere.center).addScaledVector(view.direction, -distance);
+  view.lookAt(sphere.center);
+}
+
+momentViews.addEventListener('click', event => {
+  const button = event.target.closest('[data-moment]');
+  const record = clouds.get('3');
+  if (!button || selectedPerson !== '3' || !record?.ready) return;
+  const selection = button.dataset.moment;
+  updateMomentSelection(selection);
+  if (selection === 'overview') {
+    frameTiagoOverview(record.pointclouds);
+    return;
+  }
+  const {position, target} = tiagoMoments[selection];
+  viewer.controls.stop();
+  viewer.controls.stopTweens?.();
+  viewer.scene.view.position.set(...position);
+  viewer.scene.view.lookAt(...target);
+});
+
 function renderRoute() {
   const available = Boolean(routes[selectedPerson]);
   const record = clouds.get(selectedPerson);
   const loaded = Boolean(record?.ready);
+  momentsPanel.hidden = selectedPerson !== '3' || !loaded;
   viewerFrame.classList.toggle('route-pending', !available);
   for (const [person, entry] of clouds) {
     for (const cloud of entry.pointclouds || []) cloud.visible = person === selectedPerson && entry.ready;
@@ -99,6 +158,7 @@ function frameCloud(pointclouds) {
 
 function openExperience(person, page = currentPages.get(person) ?? 0, writeHistory = true) {
   selectedPerson = person;
+  if (person === '3') updateMomentSelection('overview');
   hasEntered = true;
   people.forEach(button => {
     if (button.dataset.person === person) button.setAttribute('aria-current', 'true');
@@ -122,7 +182,10 @@ function openExperience(person, page = currentPages.get(person) ?? 0, writeHisto
   renderRoute();
   setMenu(false);
   const record = clouds.get(person);
-  if (record?.ready) frameCloud(record.pointclouds);
+  if (record?.ready) {
+    if (person === '3') frameTiagoOverview(record.pointclouds);
+    else frameCloud(record.pointclouds);
+  }
   else if (routes[person]) loadViewer(person);
 }
 
@@ -212,7 +275,10 @@ async function loadViewer(person) {
       for (const pointcloud of pointclouds) viewer.scene.addPointCloud(pointcloud);
       renderRoute();
       // A previous download completing must not replace the current page's camera.
-      if (selectedPerson === person) frameCloud(record.pointclouds);
+      if (selectedPerson === person && hasEntered) {
+        if (person === '3') frameTiagoOverview(record.pointclouds);
+        else frameCloud(record.pointclouds);
+      }
     } catch (error) {
       console.error(`Não foi possível carregar o percurso ${person}:`, error);
       record.error = true;

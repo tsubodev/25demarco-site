@@ -11,7 +11,7 @@
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/openlayers3/ol.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/spectrum/spectrum.css">
 	<link rel="stylesheet" type="text/css" href="vendor/potree-1.8.2/libs/jstree/themes/mixed/style.css">
-  <link rel="stylesheet" href="assets/interface.css?v=layout-subpages-1">
+  <link rel="stylesheet" href="assets/interface.css?v=tiago-momentos-1">
 </head>
 <body class="home-view menu-open">
   <header class="site-header">
@@ -19,16 +19,28 @@
     <button class="menu-button" type="button" aria-expanded="false" aria-controls="people-menu">MENU <span aria-hidden="true">▾</span></button>
   </header>
   <main class="workspace" id="workspace" inert>
-    <section class="viewer-frame" aria-label="Visualização interativa do percurso">
-      <nav id="route-pages" class="page-navigation" aria-label="Páginas do puxador">
-        <button id="page-previous" type="button" aria-label="Página anterior">← <span>Anterior</span></button>
-        <span id="page-indicator" role="status" aria-live="polite" aria-atomic="true">1 / 9</span>
-        <button id="page-next" type="button" aria-label="Próxima página"><span>Próxima</span> →</button>
-      </nav>
-      <div id="potree_render_area" class="potree_container"></div>
-      <button id="viewer-interaction" class="viewer-interaction" type="button" aria-pressed="false">EXPLORAR NUVEM</button>
-      <p id="viewer-status" class="viewer-status" role="status">Selecione um puxador para conhecer seu percurso.</p>
-    </section>
+    <div class="viewer-column">
+      <section class="viewer-frame" aria-label="Visualização interativa do percurso">
+        <nav id="route-pages" class="page-navigation" aria-label="Páginas do puxador">
+          <button id="page-previous" type="button" aria-label="Página anterior">← <span>Anterior</span></button>
+          <span id="page-indicator" role="status" aria-live="polite" aria-atomic="true">1 / 9</span>
+          <button id="page-next" type="button" aria-label="Próxima página"><span>Próxima</span> →</button>
+        </nav>
+        <div id="potree_render_area" class="potree_container"></div>
+        <button id="viewer-interaction" class="viewer-interaction" type="button" aria-pressed="false">EXPLORAR NUVEM</button>
+        <p id="viewer-status" class="viewer-status" role="status">Selecione um puxador para conhecer seu percurso.</p>
+      </section>
+      <section id="tiago-moments" class="moments-panel" aria-labelledby="moments-title" hidden>
+        <h3 id="moments-title">Momentos do percurso</h3>
+        <div id="moment-views" class="moment-views" role="group" aria-label="Vistas da nuvem">
+          <button type="button" data-moment="overview" aria-pressed="true">Vista geral</button>
+        </div>
+        <div id="moment-description" aria-live="polite" aria-atomic="true" hidden>
+          <h4 id="moment-title"></h4>
+          <p id="moment-caption"></p>
+        </div>
+      </section>
+    </div>
     <aside class="story-panel" aria-labelledby="person-heading">
       <h2 id="person-heading"><span>PUXADOR 1 - GUILHERME</span></h2>
       <img id="route-map" class="route-map" src="assets/layout/map-1.webp" alt="Mapa do percurso de Guilherme" width="1200" height="799">
@@ -79,6 +91,6 @@
 	<script src="vendor/potree-1.8.2/build/potree/potree.js"></script>
 	<script src="vendor/potree-1.8.2/libs/plasio/js/laslaz.js"></script>
 
-  <script type="module" src="assets/interface.js?v=layout-subpages-1"></script>
+  <script type="module" src="assets/interface.js?v=tiago-momentos-1"></script>
 </body>
 </html>
