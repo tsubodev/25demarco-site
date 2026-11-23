@@ -147,3 +147,13 @@ python3 tools/check-subpages.py --url http://127.0.0.1:8000/
 ### Ajuste final de 5° horário em Y
 
 A orientação anterior recebe mais **−5° em Y mundial**, no sentido horário visto de +Y em direção à origem. A composição atual é `Ry(−5°) × Rx(90°) × Ry(45°)`, com pivô em `(0, 0, 0)`. O campo `worldYAdjustmentDegrees: -5` é aplicado depois das rotações anteriores, tanto aos 17 point clouds quanto à trajetória, marcadores e visita guiada. Não equivale a alterar a primeira rotação em Y de 45° para 40°, pois há uma rotação em X entre elas. Os arquivos originais continuam intactos.
+
+## Zoom com scroll em navegadores modernos
+
+`assets/wheel-input.js` adapta o evento padrão `wheel` ao `InputHandler` oficial do Potree 1.8.2. O vendor escuta apenas `mousewheel` e `DOMMouseScroll`, que deixaram de ser emitidos pelo Chromium recente. A adaptação preserva a seleção de controles e objetos sob o cursor, suprime os eventos legados para evitar zoom duplicado e não altera os arquivos oficiais. Ctrl+scroll, movimentos só horizontais e input desativado não são consumidos. O zoom durante a visita guiada pausa a animação antes de encaminhar o scroll, preservando o primeiro movimento de zoom. A rolagem nativa do celular continua controlada pelos modos EXPLORAR NUVEM/VOLTAR À ROLAGEM.
+
+```sh
+python3 tools/check-wheel-zoom.py --url http://127.0.0.1:8012/
+```
+
+O teste usa scroll real do Chromium nas quatro nuvens e verifica aproximação/afastamento, eventos legados duplicados, input desativado, Ctrl+scroll e saída da visita guiada. A compatibilidade dos eventos antigos é simulada; isso não equivale a executar o Firefox.

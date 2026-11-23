@@ -1,3 +1,4 @@
+import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
 import { introduction, peopleContent } from './people.js';
 import { createReferenceAxes } from './reference-axes.js';
@@ -156,6 +157,7 @@ async function ensureViewer() {
       viewer.setPointBudget(1_000_000);
       viewer.setBackground(null);
       viewer.setDescription('');
+      installWheelInput(viewer, () => tour?.pause());
       referenceAxes = createReferenceAxes(three);
       viewer.scene.scene.add(referenceAxes);
       // Keep the origin reference legible while orbiting/zooming; this is not a ruler.
