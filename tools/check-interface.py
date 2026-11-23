@@ -31,7 +31,7 @@ with sync_playwright() as p:
   assert not page.locator('#workspace').evaluate('(e)=>e.inert')
   assert page.locator('.potree_menu_toggle').count()==0
   settings=page.evaluate('''() => {const c=viewer.scene.pointclouds[0],m=c.material;return {size:m.size,adaptive:m.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:m.shape===Potree.PointShape.CIRCLE,background:viewer.background,edl:viewer.getEDLEnabled(),clouds:viewer.scene.pointclouds.length}}''')
-  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=1),settings
+  assert settings==dict(size=.25,adaptive=True,circle=True,background=None,edl=False,clouds=16),settings
   rect=page.locator('.viewer-frame').bounding_box();canvas=page.locator('#potree_render_area canvas').first.bounding_box()
   assert abs(rect['width']-canvas['width'])<3 and abs(rect['height']-canvas['height'])<3,(rect,canvas)
   page.screenshot(path=str(args.screenshots / f'pointcloud-ui-{width}.png'),full_page=True)
@@ -81,17 +81,20 @@ with sync_playwright() as p:
   page.locator('[data-person="1"]').click()
   page.wait_for_function('viewer.scene.pointclouds[0].visible && viewer.scene.pointclouds[0].numVisiblePoints > 0')
   assert page.locator('#viewer-status').is_hidden()
-  for person, name in (('2','6718'),('1','6716'),('2','6718'),('1','6716')):
+  for person, code in (('2','GPBK627'),('3','GPBK6732'),('1',None)):
    page.locator('.menu-button').click()
    page.locator(f'[data-person="{person}"]').click()
-   page.wait_for_function('(name) => viewer.scene.pointclouds.some(c => c.name === name && c.visible && c.numVisiblePoints > 0)',arg=name,timeout=45000)
-   visible=page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).map(c=>c.name)')
-   assert visible==[name],visible
-   assert page.evaluate('viewer.scene.pointclouds.length')==19
-   assert page.locator('#viewer-status').is_hidden()
-   route_settings=page.evaluate('''() => {const m=viewer.scene.pointclouds.find(c=>c.visible).material;return {size:m.size,adaptive:m.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:m.shape===Potree.PointShape.CIRCLE}}''')
-   assert route_settings==dict(size=.25,adaptive=True,circle=True),route_settings
-  print('PASS: pages 1 and 2 show only their assigned cloud, without duplicate loads',width,flush=True)
+   visible = page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).map(c=>c.name)')
+   if code:
+    assert visible == []
+    assert code in page.locator('#viewer-status').inner_text()
+    assert page.locator('#tiago-moments').is_hidden()
+   else:
+    assert len(visible) == 3
+    assert all(name.startswith('6717 / ') for name in visible)
+    assert page.locator('#viewer-status').is_hidden()
+   assert page.evaluate('viewer.scene.pointclouds.length') == 33
+  print('PASS: Fusion 1 assignments, pending routes and cached clouds',width,flush=True)
   page.keyboard.press('Escape');assert page.locator('#start-menu').is_visible()
   page.keyboard.press('Escape');assert not page.locator('#start-menu').is_visible()
   assert not errors and not failed,(errors,failed)

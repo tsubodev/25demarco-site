@@ -1,0 +1,214 @@
+{
+  "1": [
+    {
+      "code": "GPBK6717",
+      "sources": [
+        {
+          "url": "pointclouds/6717/static/6717.11_converted/cloud.js",
+          "name": "6717 / 6717.11"
+        },
+        {
+          "url": "pointclouds/6717/static/6717.12_converted/cloud.js",
+          "name": "6717 / 6717.12"
+        },
+        {
+          "url": "pointclouds/6717/static/6717.2_converted/cloud.js",
+          "name": "6717 / 6717.2"
+        }
+      ]
+    },
+    {
+      "code": "GPBK6718",
+      "sources": [
+        {
+          "url": "pointclouds/6718-static/cloud.js",
+          "name": "6718"
+        }
+      ]
+    },
+    {
+      "code": "GPBK6719",
+      "sources": [
+        {
+          "url": "pointclouds/6719/static/project1_converted/cloud.js",
+          "name": "6719 / project1"
+        },
+        {
+          "url": "pointclouds/6719/static/project2_converted/cloud.js",
+          "name": "6719 / project2"
+        },
+        {
+          "url": "pointclouds/6719/static/project3_converted/cloud.js",
+          "name": "6719 / project3"
+        },
+        {
+          "url": "pointclouds/6719/static/project41_converted/cloud.js",
+          "name": "6719 / project41"
+        },
+        {
+          "url": "pointclouds/6719/static/project42_converted/cloud.js",
+          "name": "6719 / project42"
+        },
+        {
+          "url": "pointclouds/6719/static/project43_converted/cloud.js",
+          "name": "6719 / project43"
+        },
+        {
+          "url": "pointclouds/6719/static/project44_converted/cloud.js",
+          "name": "6719 / project44"
+        },
+        {
+          "url": "pointclouds/6719/static/project5_converted/cloud.js",
+          "name": "6719 / project5"
+        },
+        {
+          "url": "pointclouds/6719/static/project61_converted/cloud.js",
+          "name": "6719 / project61"
+        },
+        {
+          "url": "pointclouds/6719/static/project62_converted/cloud.js",
+          "name": "6719 / project62"
+        },
+        {
+          "url": "pointclouds/6719/static/project63_converted/cloud.js",
+          "name": "6719 / project63"
+        },
+        {
+          "url": "pointclouds/6719/static/project6_converted/cloud.js",
+          "name": "6719 / project6"
+        }
+      ]
+    },
+    {
+      "code": "GPBK6720"
+    },
+    {
+      "code": "GPBK6721"
+    },
+    {
+      "code": "GPBK6722"
+    },
+    {
+      "code": "GPBK6723"
+    },
+    {
+      "code": "GPBK6724"
+    },
+    {
+      "code": "GPBK6725"
+    },
+    {
+      "code": "GPBK6726"
+    }
+  ],
+  "2": [
+    {
+      "code": "GPBK627"
+    },
+    {
+      "code": "GPBK6728"
+    },
+    {
+      "code": "GPBK6729"
+    },
+    {
+      "code": "GB016730"
+    },
+    {
+      "code": "GPBK6730"
+    }
+  ],
+  "3": [
+    {
+      "code": "GPBK6732"
+    }
+  ],
+  "4": [
+    {
+      "code": "GPBK6733"
+    },
+    {
+      "code": "GPBK6734"
+    },
+    {
+      "code": "GPBK6735",
+      "rotationYDegrees": 45,
+      "rotationXDegrees": 90,
+      "worldYAdjustmentDegrees": -5,
+      "trajectory": "./6735-trajectory.json",
+      "sources": [
+        {
+          "url": "pointclouds/6735/static/6735.1 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.1"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.21 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.21"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.22 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.22"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.23 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.23"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.31 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.31"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.32 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.32"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.33 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.33"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.34 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.34"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.35 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.35"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.41 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.41"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.42 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.42"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.43 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.43"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.441 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.441"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.442 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.442"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.443 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.443"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.45 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.45"
+        },
+        {
+          "url": "pointclouds/6735/static/6735.5 - Cloud_converted/cloud.js",
+          "name": "6735 / 6735.5"
+        }
+      ]
+    },
+    {
+      "code": "GPBK6736"
+    }
+  ]
+}

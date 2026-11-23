@@ -14,10 +14,11 @@ with sync_playwright() as p:
         page.on('response', lambda r: failures.append((r.status, r.url)) if r.status >= 400 else None)
         page.goto(args.url)
         page.locator('.start-button').click()
-        for person, count, clouds in (('1', 9, 1), ('2', 3, 1), ('3', 2, 12), ('4', 6, 17)):
+        for person, count, clouds in (('1', 9, 3), ('2', 3, 0), ('3', 2, 0), ('4', 6, 17)):
             page.locator(f'[data-person="{person}"]').click()
             page.wait_for_function('(n)=>viewer.scene.pointclouds.filter(c=>c.visible).length===n', arg=clouds, timeout=45000)
-            page.wait_for_function('viewer.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
+            if clouds:
+                page.wait_for_function('viewer.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
             page.wait_for_timeout(400)
             matrices = page.evaluate('viewer.scene.pointclouds.map(c=>c.matrix.toArray())')
             view = page.evaluate('viewer.scene.view.position.toArray()')
@@ -58,11 +59,15 @@ with sync_playwright() as p:
         # Reopening remembers Benne's selected subpage and keeps only 17 visible clouds.
         page.locator('[data-person="4"]').click()
         assert page.locator('#page-indicator').inner_text().endswith('5 / 6')
-        assert page.evaluate('viewer.scene.pointclouds.length') == 31
+        assert page.evaluate('viewer.scene.pointclouds.length') == 33
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         assert not errors and not failures, (errors, failures)
         page.close()
         direct = browser.new_page(viewport={'width': width, 'height': height})
+        direct.goto(args.url + '#puxador-3/pagina-1')
+        assert 'GPBK6732' in direct.locator('#viewer-status').inner_text()
+        assert direct.locator('#tiago-moments').is_hidden()
+        assert direct.evaluate('!window.viewer')
         direct.goto(args.url + '#puxador-4/pagina-6')
         direct.wait_for_function('window.viewer?.scene.pointclouds.filter(c=>c.visible).length===17', timeout=45000)
         assert direct.locator('#page-indicator').inner_text().endswith('6 / 6')

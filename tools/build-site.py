@@ -1,15 +1,25 @@
 """Package only the files served by the site, keeping original datasets in Git."""
 import argparse
+import json
 from pathlib import Path
 import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
-CLOUDS = (
-    'pointclouds/6716-static-v2',
-    'pointclouds/6718-static',
-    'pointclouds/6719/static',
-    'pointclouds/6735/static',
-)
+
+
+def cloud_folders():
+    catalog = json.loads((ROOT / 'assets/cloud-catalog.json').read_text())
+    folders = set()
+    for datasets in catalog.values():
+        for dataset in datasets:
+            for source in dataset.get('sources', []):
+                path = Path(source['url'])
+                if len(path.parts) < 3 or path.parts[0] != 'pointclouds' or '..' in path.parts:
+                    raise ValueError(f'Invalid cloud path: {path}')
+                if not (ROOT / path).is_file():
+                    raise FileNotFoundError(ROOT / path)
+                folders.add(path.parent)
+    return sorted(folder for folder in folders if not any(parent in folders for parent in folder.parents))
 
 
 def build(target):
@@ -20,7 +30,7 @@ def build(target):
     target.mkdir(parents=True, exist_ok=False)
     for name in ('index.html', '.nojekyll'):
         shutil.copy2(ROOT / name, target / name)
-    for name in ('assets', 'vendor', *CLOUDS):
+    for name in ('assets', 'vendor', *cloud_folders()):
         shutil.copytree(ROOT / name, target / name)
     size = sum(p.stat().st_size for p in target.rglob('*') if p.is_file())
     if size >= 1_000_000_000:

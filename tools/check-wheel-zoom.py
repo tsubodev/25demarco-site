@@ -1,4 +1,4 @@
-"""Check actual Chromium wheel input on every route, plus legacy-event deduplication."""
+"""Check actual Chromium wheel input on every available route, plus legacy-event deduplication."""
 import argparse
 from playwright.sync_api import sync_playwright
 
@@ -12,9 +12,9 @@ with sync_playwright() as p:
     page.on('pageerror', lambda e: errors.append(str(e)))
     page.goto(args.url)
     page.locator('.start-button').click()
-    for person in ('1','2','3','4'):
+    for person in ('1','4'):
         page.locator(f'[data-person="{person}"]').click()
-        page.wait_for_function('viewer?.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
+        page.wait_for_function('window.viewer?.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
         box = page.locator('#potree_render_area canvas').first.bounding_box()
         page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.6)
         page.wait_for_timeout(200)
