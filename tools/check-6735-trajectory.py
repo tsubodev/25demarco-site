@@ -119,7 +119,7 @@ with sync_playwright() as p:
         assert page.locator('#guided-route').is_hidden()
         assert page.evaluate('!viewer.scene.scene.getObjectByName("6735 camera trajectory").visible')
         page.locator('[data-person="1"]').click()
-        page.wait_for_function('viewer.scene.pointclouds.some(c=>c.name==="6716" && c.visible)', timeout=45000)
+        page.wait_for_function('viewer.scene.pointclouds.some(c=>c.name.startsWith("6717 / ") && c.visible)', timeout=45000)
         assert page.locator('#guided-route').is_hidden()
         page.locator('.menu-button').click()
         page.locator('[data-person="4"]').click()

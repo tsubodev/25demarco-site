@@ -2,7 +2,7 @@
 
 Instalação estática do [Potree oficial](https://github.com/potree/potree), tag `1.8.2`, commit `3013577379b5c8530ebca3cdc980f7585ae2320f`.
 
-`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base; a nuvem é `6716-static-v2`, preparada a partir do arquivo original `6716-cloud`. A nuvem `25 de março` e o arquivo original `6716-cloud` permanecem preservados em `pointclouds/`. As nuvens de demonstração foram removidas.
+`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base; a cópia `6716-static-v2` foi preparada a partir do arquivo original `6716-cloud` e está sem associação na planilha atual. A nuvem `25 de março` e o arquivo original `6716-cloud` permanecem preservados em `pointclouds/`. As nuvens de demonstração foram removidas.
 
 ## Executar
 
@@ -22,11 +22,11 @@ Clone `https://github.com/potree/potree` na tag `1.8.2` em uma pasta separada, e
 
 No GitHub Pages, selecione **Settings → Pages → Build and deployment → Source → GitHub Actions**. O workflow `.github/workflows/pages.yml` publica automaticamente os commits de `main`.
 
-`python3 tools/build-site.py /tmp/25demarco-site-build` prepara o pacote em um diretório novo, fora do repositório. Ele inclui apenas a aplicação, as bibliotecas e os datasets de exibição dos quatro puxadores; originais, XMLs e ferramentas permanecem no Git, fora do pacote publicado. Isso mantém a publicação abaixo do limite de 1 GB do Pages. `.nojekyll` mantém a publicação estática. O envio para `main` não confirma, por si só, que o deploy terminou.
+`python3 tools/build-site.py /tmp/25demarco-site-build` prepara o pacote em um diretório novo, fora do repositório. Ele inclui apenas a aplicação, as bibliotecas e os datasets de exibição cadastrados; originais, XMLs e ferramentas permanecem no Git, fora do pacote publicado. Isso mantém a publicação abaixo do limite de 1 GB do Pages. `.nojekyll` mantém a publicação estática. O envio para `main` não confirma, por si só, que o deploy terminou.
 
 ## Interface alpha
 
-O site inicia em uma apresentação com **iniciar >**, conforme o PDF `ev - 25 de março_TESTE_2.pdf`. O botão abre a seleção de puxadores. A opção **PUXADOR 1** abre a nuvem 6716, **PUXADOR 2** abre a 6718 e **PUXADOR 3** reúne os 12 trechos da 6719 no mesmo visualizador. PUXADOR 4 reúne os 17 trechos da 6735 no mesmo visualizador. Cada página carrega apenas seu próprio conjunto; ao trocar de página, apenas os trechos do percurso selecionado ficam visíveis. Os nomes são Guilherme, Emily, Tiago e Benne. O botão MENU permite retornar à seleção; Escape alterna o menu depois que o percurso é aberto. O Potree é inicializado apenas ao entrar no percurso.
+O site inicia em uma apresentação com **iniciar >**, conforme o PDF `ev - 25 de março_TESTE_2.pdf`. O botão abre a seleção de puxadores. A associação das nuvens segue o catálogo Fusion 1 abaixo. Cada página carrega apenas seu próprio conjunto; ao trocar de página, apenas os trechos do percurso selecionado ficam visíveis. Os nomes são Guilherme, Emily, Tiago e Benne. O botão MENU permite retornar à seleção; Escape alterna o menu depois que o percurso é aberto. O Potree é inicializado apenas ao entrar no percurso.
 
 O layout usa roxo, amarelo-claro, títulos em itálico e degradê na abertura. A área do Potree usa fundo transparente sobre o roxo do site, Eye-Dome Lighting desligado, tamanho 0.25, sizing ADAPTIVE e shape CIRCLE. A coluna lateral apresenta mapa estático, relato e quatro fotografias extraídos do PDF. O título e o texto de abertura continuam provisórios como na referência. Os controles da visita e dos eixos ficam em uma seção recolhível depois das fotos. Os créditos seguem a referência fornecida. O menu nativo do Potree permanece desativado.
 
@@ -42,16 +42,16 @@ O teste também verifica a ausência de erros HTTP/JavaScript, o retorno ao menu
 
 ## Cadastro de point clouds por puxador
 
-As páginas são independentes e o vínculo fica em `assets/point-clouds.js`:
+O catálogo [Fusion 1](assets/cloud-catalog.json) registra a ordem das colunas da planilha. Cada item representa uma nuvem. Itens sem `sources` aguardam importação. O visualizador e o pacote do Pages usam o mesmo catálogo.
 
-| Página do menu | Point cloud |
-| --- | --- |
-| PUXADOR 1 | 6716 (disponível) |
-| PUXADOR 2 | 6718 (disponível) |
-| PUXADOR 3 | 6719 — 12 trechos alinhados (disponível) |
-| PUXADOR 4 | 6735 — 17 trechos alinhados (disponível) |
+| Puxador | Disponíveis | Aguardando importação, na ordem da planilha |
+| --- | --- | --- |
+| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718, GPBK6719 (12 trechos) | GPBK6720 a GPBK6726 |
+| 2 · Emily | — | GPBK627, GPBK6728, GPBK6729, GB016730, GPBK6730 |
+| 3 · Thiago | — | GPBK6732 |
+| 4 · Benny (Benne no site) | GPBK6735 (17 trechos) | GPBK6733, GPBK6734, GPBK6736 |
 
-Uma entrada `null` exibe “O percurso deste puxador será adicionado em breve” e não carrega a nuvem de outro puxador. Ao receber um novo dataset, prepare seus arquivos em uma pasta própria e preencha o cadastro da página correspondente com `url` e `name`. Preserve os arquivos das outras páginas.
+Ao importar uma nuvem, prepare a cópia estática em uma pasta própria e preencha `sources` no item correspondente com objetos `{ "url": "pointclouds/.../cloud.js", "name": "..." }`. O caminho deve apontar para um descritor existente. O empacotamento inclui as pastas desses descritores. Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. O conjunto 6716 fica arquivado. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
 
 Para preparar novos datasets no mesmo formato estático, preservando os originais:
 
@@ -61,11 +61,23 @@ python3 tools/prepare_point_cloud.py pointclouds/6718-cloud pointclouds/6718-sta
 
 A nuvem 6718 contém 490.330 pontos. As configurações ADAPTIVE, CIRCLE, 0.25, fundo branco e EDL desligado se aplicam a todos os percursos. As nuvens são carregadas sob demanda e mantidas em cache; retornar a uma página não duplica seu point cloud. O enquadramento usa apenas o percurso selecionado.
 
+## Conjunto 6717
+
+Os três trechos da GPBK6717 ficam em `pointclouds/6717/original/`, com cópias para exibição em `pointclouds/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. O seletor **Nuvem** permite alternar entre 6717, 6718 e 6719 no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
+
+Para regenerar as cópias estáticas:
+
+```sh
+for segment in 6717.11_converted 6717.12_converted 6717.2_converted; do
+  python3 tools/prepare_point_cloud.py "pointclouds/6717/original/$segment" "pointclouds/6717/static/$segment"
+done
+```
+
 ## Conjunto 6719
 
 Os 12 diretórios recebidos foram movidos de `6719/` para `pointclouds/6719/original/`, sem editar seu conteúdo. A cópia para exibição fica em `pointclouds/6719/static/`; são **11.321.028 pontos** no total.
 
-Todos os trechos são carregados juntos no PUXADOR 3, em um único visualizador Potree. As coordenadas e os offsets de origem de cada trecho são preservados; não há translação dos point clouds para zero, troca de eixos ou mudança de escala. O enquadramento existente considera o conjunto selecionado, sem alterar a origem dos dados.
+Todos os trechos são carregados juntos no PUXADOR 1 (Guilherme), ao lado da 6718, quando a GPBK6719 está selecionada no visualizador Potree. As coordenadas e os offsets de origem de cada trecho são preservados; não há translação dos point clouds para zero, troca de eixos ou mudança de escala. O enquadramento existente considera o conjunto selecionado, sem alterar a origem dos dados.
 
 Para reproduzir os arquivos de exibição:
 
@@ -78,7 +90,7 @@ python3 tools/check-6719.py --url http://127.0.0.1:8000/
 
 ## Conjunto 6735
 
-O PUXADOR 4 carrega os 17 trechos da 6735 juntos. Os originais e `6735 cam.xml` permanecem em `pointclouds/6735/`; as cópias de exibição ficam em `pointclouds/6735/static/`. São **8.012.558 pontos**. Cada trecho preserva as coordenadas, os offsets e a origem recebidos, sem translação para zero, troca de eixos ou mudança de escala. O XML não é usado para trajetória ou animação.
+O PUXADOR 4 carrega os 17 trechos da 6735 juntos. Os originais e `6735 cam.xml` permanecem em `pointclouds/6735/`; as cópias de exibição ficam em `pointclouds/6735/static/`. São **8.012.558 pontos**. Cada trecho preserva as coordenadas, os offsets e a origem recebidos, sem translação para zero, troca de eixos ou mudança de escala. O XML é a fonte da trajetória descrita abaixo.
 
 Para reproduzir e verificar:
 
@@ -156,4 +168,4 @@ A orientação anterior recebe mais **−5° em Y mundial**, no sentido horário
 python3 tools/check-wheel-zoom.py --url http://127.0.0.1:8012/
 ```
 
-O teste usa scroll real do Chromium nas quatro nuvens e verifica aproximação/afastamento, eventos legados duplicados, input desativado, Ctrl+scroll e saída da visita guiada. A compatibilidade dos eventos antigos é simulada; isso não equivale a executar o Firefox.
+O teste usa scroll real do Chromium nas rotas com nuvens disponíveis e verifica aproximação/afastamento, eventos legados duplicados, input desativado, Ctrl+scroll e saída da visita guiada. A compatibilidade dos eventos antigos é simulada; isso não equivale a executar o Firefox.
