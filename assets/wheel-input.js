@@ -1,12 +1,10 @@
 // Potree 1.8.2 only registers legacy mousewheel/DOMMouseScroll listeners.
 // Modern Chromium emits wheel exclusively; route it through Potree's own input
 // handler so hovered objects and the selected navigation mode still work.
-export function installWheelInput(viewer, beforeZoom = () => {}) {
+export function installWheelInput(viewer) {
   const canvas = viewer.renderer.domElement;
   canvas.addEventListener('wheel', event => {
     if (!viewer.inputHandler.enabled || event.ctrlKey || !Number.isFinite(event.deltaY) || event.deltaY === 0) return;
-    // Pause guided playback before delivering zoom: pausing clears control deltas.
-    beforeZoom();
     viewer.inputHandler.onMouseWheel({
       wheelDelta: -event.deltaY,
       preventDefault: () => event.preventDefault(),

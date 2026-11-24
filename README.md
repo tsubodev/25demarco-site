@@ -109,52 +109,23 @@ python3 tools/check-6735.py --url http://127.0.0.1:8000/
 
 O preparador verifica todos os pontos e limita o erro de quantização a 0,00000005 unidade. A cópia estática exporta posições e RGB; os atributos completos permanecem nos originais. O teste verifica as 17 origens, a renderização e a troca de percursos sem duplicação.
 
-## Trajetória e visita guiada — PUXADOR 4
+## Dados de referência da 6735
 
-`pointclouds/6735/6735 cam.xml` contém 240 câmeras alinhadas do sensor esférico, em um único chunk/componente, com referência `Local Coordinates (m)`. Os nomes `VÍDEO_6735000` a `VÍDEO_6735239` definem a ordem numérica; não há tempos de captura. As matrizes são poses câmera → chunk; seus centros são a última coluna. Não há transformação adicional de chunk/componente. A rotação `region/R` descreve a caixa de recorte, não deve ser aplicada às câmeras.
-
-O mapeamento do XML para os dados originais da nuvem é identidade: os centros permanecem no referencial local recebido, sem subtrair offsets, recentralizar ou trocar eixos. Os 240 centros estão dentro dos limites dos trechos da 6735. Uma comparação com uma amostra de 1/20 dos pontos originais encontrou distância mediana de 2,37 m e máxima de 4,55 m entre câmeras e superfícies. Isso é evidência de compatibilidade espacial, não substitui uma conferência independente no projeto Metashape; os metadados Potree não declaram projeção nem documentam eventuais transformações externas.
-
-Para reproduzir e validar:
-
-```sh
-python3 tools/prepare-6735-trajectory.py
-python3 tools/check-6735-trajectory.py --url http://127.0.0.1:8000/
-# Opcional: também reproduzir a visita desktop inteira em tempo real.
-python3 tools/check-6735-trajectory.py --url http://127.0.0.1:8000/ --full-playback
-```
-
-O JSON `assets/6735-trajectory.json` preserva os centros sem suavização, identifica o hash do XML, as unidades, a matriz identidade e os tempos ausentes (`null`). O preparador rejeita frames ausentes, centros consecutivos repetidos e saltos acima de 5 m ou cinco vezes a mediana, exigindo revisão antes de ligar possíveis sessões. Neste XML o maior passo é 2,18 m; o caminho mede cerca de 270,13 m.
-
-A linha de 3 pixels usa o Line2 oficial já incluído no vendor, aparece sobre os pontos e permanece na altura real da captura, com início verde, fim vermelho e marcador amarelo da visita. Sua visibilidade é opcional. A animação interpola linearmente os centros para preservar esquinas, avança pela distância acumulada a 4 m/s (aproximadamente 68 s) e olha 3 m adiante. É uma velocidade de apresentação, não uma reprodução do tempo original. Não se aplica suavização espacial que possa cortar esquinas. A API CameraAnimation incluída foi inspecionada; seu `play()` não oferece pausa/retomada, por isso um controlador próprio usa o evento `update` do Potree e mantém as bibliotecas oficiais intactas.
-
-Há controles para iniciar, pausar/continuar, reiniciar, exploração livre, vista geral e mostrar/ocultar a trajetória. Iniciar ou continuar faz uma transição de 1,2 s da vista atual até a posição guardada, sem avançar o progresso durante essa transição. Essa transição de retorno não representa um trecho da captura. Entradas manuais no visualizador pausam a visita; menu, troca de puxador e aba do navegador oculta também a interrompem. No celular, os controles EXPLORAR NUVEM/VOLTAR À ROLAGEM continuam disponíveis. A publicação inclui o JSON em `assets/`, mantendo o XML original fora do pacote do Pages.
-
-## Referência de eixos — 6735
-
-O PUXADOR 4 possui uma referência XYZ ancorada na origem mundial `(0, 0, 0)`, com X vermelho, Y verde e Z azul, setas positivas, semieixos negativos discretos e letras voltadas à câmera. A opção **MOSTRAR EIXOS XYZ** permite ocultá-la. O marcador ajusta apenas seu próprio tamanho visual com o zoom para manter a legibilidade; não é uma régua. Não altera posições, offsets, escalas ou orientação das nuvens, nem o percurso guiado. Ele fica oculto no menu e nos outros puxadores.
+O XML original em `pointclouds/6735/6735 cam.xml` contém 240 posições de câmera. O script `tools/prepare-6735-trajectory.py` permite extrair essas posições para análise. Na etapa 3 de Benne, o site oferece exploração livre da nuvem.
 
 ## Rotação de exibição — 6735
 
-O conjunto do PUXADOR 4 é exibido com **+45° em torno do eixo Y mundial**, tendo `(0, 0, 0)` como pivô. O sentido é anti-horário visto de +Y em direção à origem. A mesma matriz é aplicada uma única vez aos 17 trechos e às 240 posições da trajetória, incluindo marcadores e os alvos da visita guiada. As origens exibidas dos trechos giram em torno do pivô comum; eles não são girados individualmente em seus centros. O enquadramento considera os limites transformados.
+O conjunto do PUXADOR 4 é exibido com **+45° em torno do eixo Y mundial**, tendo `(0, 0, 0)` como pivô. O sentido é anti-horário visto de +Y em direção à origem. A mesma matriz é aplicada uma única vez aos 17 trechos. As origens exibidas dos trechos giram em torno do pivô comum; eles não são girados individualmente em seus centros. O enquadramento considera os limites transformados.
 
-A configuração está em `rotationYDegrees: 45` no cadastro do PUXADOR 4. Os arquivos de nuvem, offsets de origem, XML e JSON bruto permanecem intactos; a rotação é aplicada apenas no carregamento para exibição. Os eixos XYZ continuam fixos como referência mundial, e os outros puxadores permanecem sem essa rotação. Os testes `check-6735.py` e `check-6735-trajectory.py` verificam as posições transformadas, a orientação dos trechos e o alinhamento da animação.
+A configuração está em `rotationYDegrees: 45` no cadastro do PUXADOR 4. Os arquivos de nuvem, offsets de origem, XML e JSON bruto permanecem intactos; a rotação é aplicada apenas no carregamento para exibição. O teste `check-6735.py` verifica as posições transformadas e a orientação dos trechos.
 
 ### Rotação adicional em X
 
-Após os +45° em Y, o conjunto 6735 e o percurso recebem **+90° em X mundial**, anti-horário visto de +X em direção à origem. A composição única de exibição é `Rx(90°) × Ry(45°)`, em torno de `(0, 0, 0)`. `rotationXDegrees: 90` e `rotationYDegrees: 45` ficam no cadastro do PUXADOR 4. Nuvens, trajetória, marcadores e visita recebem a mesma composição, aplicada uma vez ao carregar. Os eixos de referência permanecem mundiais e os arquivos originais continuam intactos.
-
-### Velocidade da visita
-
-A velocidade de apresentação foi duplicada de 2 para **4 m/s**. O percurso de aproximadamente 270 m leva cerca de 68 segundos, além da transição inicial de 1,2 s. Isso altera apenas o avanço da visita guiada; os controles de exploração livre permanecem independentes.
-
-### Câmera nivelada durante a visita
-
-Durante a visita guiada, inclusive na transição de retorno, a câmera mantém inclinação vertical zero (`view.pitch = 0` no referencial Z vertical do Potree). O alvo do olhar fica na mesma altura da câmera; a direção horizontal acompanha as curvas do percurso. A câmera continua seguindo todas as posições 3D da trajetória, inclusive suas variações de altura. Pausar ou sair permite voltar a inclinar livremente a vista. O bloqueio não muda nuvens, rotação do conjunto ou coordenadas do percurso.
+Após os +45° em Y, o conjunto 6735 recebe **+90° em X mundial**, anti-horário visto de +X em direção à origem. A composição única de exibição é `Rx(90°) × Ry(45°)`, em torno de `(0, 0, 0)`. `rotationXDegrees: 90` e `rotationYDegrees: 45` ficam no cadastro do PUXADOR 4. Os arquivos originais continuam intactos.
 
 ## Etapas dos puxadores
 
-A barra **Anterior / Próxima** segue as posições do catálogo Fusion 1. O Puxador 1 tem 10 etapas, Emily tem 5, Thiago tem 1 e Benne tem 4. Cada etapa abre apenas a nuvem correspondente. Os trechos de uma mesma nuvem são exibidos juntos e as associações pendentes mostram o código que aguarda importação. A visita guiada de Benne está na etapa 3, junto com a GPBK6735.
+A barra **Anterior / Próxima** segue as posições do catálogo Fusion 1. O Puxador 1 tem 10 etapas, Emily tem 5, Thiago tem 1 e Benne tem 4. Cada etapa abre apenas a nuvem correspondente. Os trechos de uma mesma nuvem são exibidos juntos e as associações pendentes mostram o código que aguarda importação. A GPBK6735 está na etapa 3 de Benne.
 
 Os mapas de `assets/route-pages.js` acompanham as etapas pela posição na lista. Uma etapa sem mapa mostra o relato e as fotos. As referências do PDF que excedem a quantidade de etapas ficam disponíveis nos arquivos para uso futuro. Links como `#puxador-4/pagina-3` abrem diretamente uma etapa. Voltar e avançar no navegador também restaura a nuvem e o mapa correspondentes.
 
@@ -164,14 +135,14 @@ python3 tools/check-subpages.py --url http://127.0.0.1:8000/
 
 ### Ajuste final de 5° horário em Y
 
-A orientação anterior recebe mais **−5° em Y mundial**, no sentido horário visto de +Y em direção à origem. A composição atual é `Ry(−5°) × Rx(90°) × Ry(45°)`, com pivô em `(0, 0, 0)`. O campo `worldYAdjustmentDegrees: -5` é aplicado depois das rotações anteriores, tanto aos 17 point clouds quanto à trajetória, marcadores e visita guiada. Não equivale a alterar a primeira rotação em Y de 45° para 40°, pois há uma rotação em X entre elas. Os arquivos originais continuam intactos.
+A orientação anterior recebe mais **−5° em Y mundial**, no sentido horário visto de +Y em direção à origem. A composição atual é `Ry(−5°) × Rx(90°) × Ry(45°)`, com pivô em `(0, 0, 0)`. O campo `worldYAdjustmentDegrees: -5` é aplicado depois das rotações anteriores, aos 17 point clouds. Não equivale a alterar a primeira rotação em Y de 45° para 40°, pois há uma rotação em X entre elas. Os arquivos originais continuam intactos.
 
 ## Zoom com scroll em navegadores modernos
 
-`assets/wheel-input.js` adapta o evento padrão `wheel` ao `InputHandler` oficial do Potree 1.8.2. O vendor escuta apenas `mousewheel` e `DOMMouseScroll`, que deixaram de ser emitidos pelo Chromium recente. A adaptação preserva a seleção de controles e objetos sob o cursor, suprime os eventos legados para evitar zoom duplicado e não altera os arquivos oficiais. Ctrl+scroll, movimentos só horizontais e input desativado não são consumidos. O zoom durante a visita guiada pausa a animação antes de encaminhar o scroll, preservando o primeiro movimento de zoom. A rolagem nativa do celular continua controlada pelos modos EXPLORAR NUVEM/VOLTAR À ROLAGEM.
+`assets/wheel-input.js` adapta o evento padrão `wheel` ao `InputHandler` oficial do Potree 1.8.2. O vendor escuta apenas `mousewheel` e `DOMMouseScroll`, que deixaram de ser emitidos pelo Chromium recente. A adaptação preserva a seleção de controles e objetos sob o cursor, suprime os eventos legados para evitar zoom duplicado e não altera os arquivos oficiais. Ctrl+scroll, movimentos só horizontais e input desativado não são consumidos. A rolagem nativa do celular continua controlada pelos modos EXPLORAR NUVEM/VOLTAR À ROLAGEM.
 
 ```sh
 python3 tools/check-wheel-zoom.py --url http://127.0.0.1:8012/
 ```
 
-O teste usa scroll real do Chromium nas rotas com nuvens disponíveis e verifica aproximação/afastamento, eventos legados duplicados, input desativado, Ctrl+scroll e saída da visita guiada. A compatibilidade dos eventos antigos é simulada; isso não equivale a executar o Firefox.
+O teste usa scroll real do Chromium nas rotas com nuvens disponíveis e verifica aproximação/afastamento, eventos legados duplicados, input desativado, e Ctrl+scroll. A compatibilidade dos eventos antigos é simulada; isso não equivale a executar o Firefox.

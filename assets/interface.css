@@ -39,14 +39,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 .menu-expanded #home-content { opacity: .25; }
 .menu-open .viewer-frame { visibility: hidden; }
 .menu-open { overflow: hidden; }
-.guided-route { margin-top: 26px; border-top: 1px solid #f2f1a440; padding-top: 14px; font-size: 12px; }
-.guided-route summary { cursor: pointer; margin-bottom: 14px; letter-spacing: .04em; }
-.guided-route label { display: flex; align-items: center; gap: 8px; margin: 10px 0; }
-.tour-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
-.tour-buttons button { background: transparent; border: 1px solid currentColor; padding: 8px; font-size: 11px; }
-.tour-buttons button:disabled { opacity: .4; cursor: default; }
-.guided-route progress { width: 100%; accent-color: var(--yellow); }
-.guided-route p { margin: 8px 0; line-height: 1.4; }
 @media (max-width: 700px) {
  :root { --edge: 22px; --header-height: 68px; }
  .site-header { padding-top: 18px; }

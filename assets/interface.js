@@ -3,9 +3,7 @@ import { tiagoMoments } from './tiago-moments.js';
 import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
 import { introduction, peopleContent } from './people.js';
-import { createReferenceAxes } from './reference-axes.js';
-import { GuidedRoute } from './guided-route.js';
-import { pointClouds as routes } from './point-clouds.js?v=fusion-1-6720-6723';
+import { pointClouds as routes } from './point-clouds.js?v=fusion-1-6720-6723-exploracao';
 
 const menuButton = document.querySelector('.menu-button');
 const startMenu = document.querySelector('#start-menu');
@@ -31,13 +29,6 @@ interactionButton.addEventListener('click', () => {
 let viewer;
 let viewerReady;
 let three;
-let tour;
-let referenceAxes;
-const axesToggle = document.querySelector('#reference-axes-toggle');
-function syncReferenceAxes() {
-  if (referenceAxes) referenceAxes.visible = isGuidedDataset() && Boolean(clouds.get(selectedDataset)?.ready) && startMenu.hidden && axesToggle.checked;
-}
-axesToggle.addEventListener('change', syncReferenceAxes);
 let selectedPerson = '1';
 let hasEntered = false;
 let menuExpanded = false;
@@ -66,7 +57,6 @@ function showSubpage(index, writeHistory = true) {
   document.querySelector('#page-indicator').textContent = `${name}${label} · ${index + 1} / ${count}`;
   previousPage.disabled = index === 0;
   nextPage.disabled = index === count - 1;
-  tour?.pause();
   setupMomentViews();
   renderRoute();
   if (dataset?.sources?.length) {
@@ -89,11 +79,6 @@ function selectedMoments() {
   if (selectedPerson === '1' && selectedDataset === 'GPBK6717') return guilhermeMoments;
   if (selectedPerson === '3' && selectedDataset === 'GPBK6719') return tiagoMoments;
   return null;
-}
-
-function isGuidedDataset() {
-  return selectedPerson === '4' && routes['4'].some(dataset =>
-    dataset.code === selectedDataset && dataset.trajectory);
 }
 
 const momentsPanel = document.querySelector('#tiago-moments');
@@ -173,8 +158,6 @@ function renderRoute() {
   momentsPanel.hidden = !selectedMoments() || !loaded;
   viewerFrame.classList.toggle('route-pending', !available);
   syncCloudVisibility();
-  tour?.setActive(isGuidedDataset() && loaded && startMenu.hidden);
-  syncReferenceAxes();
   interactionButton.hidden = !loaded;
   status.hidden = loaded;
   status.textContent = !available
@@ -242,8 +225,6 @@ function setMenu(open) {
   homeContent.hidden = !welcome;
   homeContent.inert = open;
   workspace.inert = open || welcome;
-  tour?.setActive(!open && hasEntered && isGuidedDataset() && Boolean(clouds.get(selectedDataset)?.ready));
-  syncReferenceAxes();
   menuButton.setAttribute('aria-expanded', String(open));
   if (open) (document.querySelector('[aria-current="true"]') || firstPerson).focus();
   else menuButton.focus();
@@ -261,24 +242,7 @@ async function ensureViewer() {
       viewer.setPointBudget(1_000_000);
       viewer.setBackground(null);
       viewer.setDescription('');
-      installWheelInput(viewer, () => tour?.pause());
-      referenceAxes = createReferenceAxes(three);
-      viewer.scene.scene.add(referenceAxes);
-      // Keep the origin reference legible while orbiting/zooming; this is not a ruler.
-      viewer.addEventListener('update', () => {
-        if (!referenceAxes.visible) return;
-        const camera = viewer.scene.getActiveCamera();
-        const distance = viewer.scene.view.position.distanceTo(referenceAxes.position);
-        const height = Math.max(1, viewer.renderer.domElement.clientHeight);
-        const span = camera.isPerspectiveCamera ? 2 * distance * Math.tan(camera.fov * Math.PI / 360) : camera.top - camera.bottom;
-        const size = span * 80 / height;
-        referenceAxes.scale.setScalar(Math.max(.001, size / referenceAxes.userData.axisLength));
-      });
-      const guidedDataset = routes['4'].find(dataset => dataset.trajectory && dataset.sources?.length);
-      if (guidedDataset) {
-        tour = new GuidedRoute(viewer, three, guidedDataset.trajectory,
-          () => frameCloud(visibleClouds(clouds.get(guidedDataset.code))), displayTransformFor(guidedDataset));
-      }
+      installWheelInput(viewer);
     })();
   }
   return viewerReady;

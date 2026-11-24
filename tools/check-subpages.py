@@ -50,11 +50,7 @@ with sync_playwright() as p:
             else:
                 expect(page.locator('#viewer-status')).to_contain_text(f'{dataset["code"]} aguardando importação')
                 assert page.evaluate('!window.viewer || viewer.scene.pointclouds.every(c=>!c.visible)')
-            if dataset['code'] == 'GPBK6735':
-                expect(page.locator('#guided-route')).to_be_visible()
-            else:
-                expect(page.locator('#guided-route')).to_be_hidden()
-
+            assert page.locator('#guided-route, #tour-play, #tour-path, #reference-axes-toggle').count() == 0
             if dataset['code'] == 'GPBK6717':
                 expect(page.locator('#tiago-moments')).to_be_visible()
                 expect(page.locator('#moment-description')).to_be_hidden()
@@ -83,10 +79,8 @@ with sync_playwright() as p:
     expect(indicator).to_contain_text('GPBK6736 · 4 / 4')
     previous_page.click()
     expect(indicator).to_contain_text('GPBK6735 · 3 / 4')
-    expect(page.locator('#guided-route')).to_be_visible()
     page.go_back()
     expect(indicator).to_contain_text('GPBK6736 · 4 / 4')
-    expect(page.locator('#guided-route')).to_be_hidden()
     page.go_forward()
     expect(indicator).to_contain_text('GPBK6735 · 3 / 4')
     assert page.evaluate('viewer.scene.pointclouds.length') == 62
@@ -114,5 +108,5 @@ with sync_playwright() as p:
     isolated.locator('#page-previous').click()
     isolated.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible && c.userData.datasetCode==="GPBK6718").length===7')
     assert not errors, errors
-    print('PASS: 20 stages, linked clouds and maps, pending stages, guided tour, browser history, direct link and isolated 404/retry')
+    print('PASS: 20 stages, linked clouds and maps, pending stages, free navigation, browser history, direct link and isolated 404/retry')
     browser.close()

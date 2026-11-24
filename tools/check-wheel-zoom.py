@@ -56,16 +56,6 @@ with sync_playwright() as p:
       return {vertical,count,prevented:wheel.defaultPrevented,horizontal:horizontal.defaultPrevented,ctrl:ctrl.defaultPrevented,disabled:disabled.defaultPrevented};
     }''')
     assert result == dict(vertical=1,count=1,prevented=True,horizontal=False,ctrl=False,disabled=False),result
-    page.locator('#tour-options summary').click()
-    page.locator('#tour-play').click()
-    page.wait_for_function('document.querySelector("#tour-progress").value>.003')
-    box = page.locator('#potree_render_area canvas').first.bounding_box()
-    page.mouse.move(box['x']+box['width']*.5,box['y']+box['height']*.6)
-    page.wait_for_timeout(100)
-    before = page.evaluate('viewer.scene.view.radius')
-    page.mouse.wheel(0,-120)
-    page.wait_for_function('document.querySelector("#tour-pause").disabled')
-    page.wait_for_function('(r)=>viewer.scene.view.radius<r*.99',arg=before)
     assert not errors,errors
-    print('PASS: no double zoom, page/browser scrolling preserved for unhandled input, first wheel pauses tour and zooms',flush=True)
+    print('PASS: no double zoom, page/browser scrolling preserved for unhandled input',flush=True)
     browser.close()
