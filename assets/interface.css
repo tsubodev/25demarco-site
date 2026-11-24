@@ -30,6 +30,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px 
 .intro-copy { margin-top: 52dvh; max-width: 57%; }
 .intro-copy h2 { margin: 0 0 20px; font-weight: 400; font-style: italic; font-size: clamp(34px, 3.4vw, 60px); }
 .intro-copy p { font-size: clamp(12px, .95vw, 18px); line-height: 1.45; margin: 0; }
+.intro-copy p + p { margin-top: .8em; }
 .credits { margin-top: auto; padding: 5dvh 0 6dvh; font-size: clamp(11px, .95vw, 17px); line-height: 1.5; }
 .credits p { margin: 0; }
 .people-menu { position: absolute; top: 17dvh; right: var(--edge); display: grid; gap: 24px; text-align: right; }

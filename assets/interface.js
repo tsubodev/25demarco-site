@@ -2,7 +2,7 @@ import { guilhermeMoments } from './guilherme-moments.js';
 import { tiagoMoments } from './tiago-moments.js';
 import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
-import { introduction, peopleContent } from './people.js';
+import { peopleContent } from './people.js';
 import { pointClouds as routes } from './point-clouds.js?v=fusion-1-6720-6723-exploracao';
 
 const menuButton = document.querySelector('.menu-button');
@@ -12,7 +12,6 @@ const people = [...document.querySelectorAll('[data-person]')];
 const firstPerson = people[0];
 const homeContent = document.querySelector('#home-content');
 const peopleMenu = document.querySelector('#people-menu');
-document.querySelector('#introduction').textContent = introduction;
 const status = document.querySelector('#viewer-status');
 const interactionButton = document.querySelector('#viewer-interaction');
 const viewerFrame = document.querySelector('.viewer-frame');
