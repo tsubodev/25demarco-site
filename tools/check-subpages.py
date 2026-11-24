@@ -89,7 +89,7 @@ with sync_playwright() as p:
     expect(page.locator('#guided-route')).to_be_hidden()
     page.go_forward()
     expect(indicator).to_contain_text('GPBK6735 · 3 / 4')
-    assert page.evaluate('viewer.scene.pointclouds.length') == 39
+    assert page.evaluate('viewer.scene.pointclouds.length') == 62
 
     direct = browser.new_page(viewport={'width': 1450, 'height': 1024})
     direct.goto(args.url + '#puxador-1/pagina-2')

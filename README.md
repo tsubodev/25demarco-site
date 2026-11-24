@@ -46,7 +46,7 @@ O catálogo [Fusion 1](assets/cloud-catalog.json) registra a ordem das colunas d
 
 | Puxador | Disponíveis | Aguardando importação, na ordem da planilha |
 | --- | --- | --- |
-| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718 (7 trechos), GPBK6719 (12 trechos) | GPBK6720 a GPBK6726 |
+| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718 (7 trechos), GPBK6719 (12 trechos), GPBK6720 (5 trechos), GPBK6722 (7 trechos), GPBK6723 (11 trechos) | GPBK6721, GPBK6724 a GPBK6726 |
 | 2 · Emily | — | GPBK627, GPBK6728, GPBK6729, GB016730, GPBK6730 |
 | 3 · Thiago | — | GPBK6732 |
 | 4 · Benny (Benne no site) | GPBK6735 (17 trechos) | GPBK6733, GPBK6734, GPBK6736 |
@@ -63,7 +63,7 @@ As configurações ADAPTIVE, CIRCLE, 0.25 e EDL desligado se aplicam a todos os 
 
 ## Conjunto 6717
 
-Os três trechos da GPBK6717 ficam em `pointclouds/6717/original/`, com cópias para exibição em `pointclouds/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. A barra **Anterior / Próxima** permite alternar entre 6717, 6718 e 6719 no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
+Os três trechos da GPBK6717 ficam em `pointclouds/6717/original/`, com cópias para exibição em `pointclouds/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. A barra **Anterior / Próxima** permite alternar entre os conjuntos de Guilherme no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
 
 Para regenerar as cópias estáticas:
 
@@ -76,6 +76,10 @@ done
 ## Conjunto 6718
 
 A GPBK6718 é composta por sete trechos e soma 5.790.014 pontos. Os originais ficam em `pointclouds/6718/original/`, e as cópias para exibição, em `pointclouds/6718/static/`. Na segunda etapa de Guilherme, os sete trechos são exibidos juntos no Puxador 1.
+
+## Conjuntos 6720, 6722 e 6723
+
+As etapas 4, 6 e 7 de Guilherme exibem a GPBK6720, a GPBK6722 e a GPBK6723, respectivamente. Os originais ficam em `pointclouds/<código>/original/`, e as cópias para exibição, em `pointclouds/<código>/static/`. Os 23 trechos mantêm suas coordenadas de origem.
 
 ## Conjunto 6719
 

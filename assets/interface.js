@@ -5,7 +5,7 @@ import { routePages } from './route-pages.js';
 import { introduction, peopleContent } from './people.js';
 import { createReferenceAxes } from './reference-axes.js';
 import { GuidedRoute } from './guided-route.js';
-import { pointClouds as routes } from './point-clouds.js?v=fusion-1-cache-2';
+import { pointClouds as routes } from './point-clouds.js?v=fusion-1-6720-6723';
 
 const menuButton = document.querySelector('.menu-button');
 const startMenu = document.querySelector('#start-menu');
