@@ -1,6 +1,7 @@
 """Check the 12 aligned 6719 segments in the PUXADOR 1 viewer."""
 import argparse
 import json
+import math
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -30,14 +31,20 @@ with sync_playwright() as p:
         assert page.evaluate('Object.fromEntries(viewer.scene.pointclouds.filter(c=>c.visible).map(c=>[c.name,c.position.toArray()]))') == expected_6717
         page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).every(c=>c.numVisiblePoints>0)', timeout=45000)
         page.locator('#page-next').click()
-        expected_6718 = {f'6718 / {p.parent.name.removesuffix("_converted")}':
-                         json.loads(p.read_text())['boundingBox']['min']
-                         for p in (root / 'pointclouds/6718/original').glob('*/metadata.json')}
+        page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).length === 7', timeout=45000)
+        expected_6718 = {}
+        for path in (root / 'pointclouds/6718/original').glob('*/metadata.json'):
+            x, y, z = json.loads(path.read_text())['boundingBox']['min']
+            expected_6718[f'6718 / {path.parent.name.removesuffix("_converted")}'] = [x, -y, -z]
         assert len(expected_6718) == 7
-        assert page.evaluate('Object.fromEntries(viewer.scene.pointclouds.filter(c=>c.visible).map(c=>[c.name,c.position.toArray()]))') == expected_6718
+        state_6718 = page.evaluate("""viewer.scene.pointclouds.filter(c=>c.visible)
+          .map(c=>({name:c.name, position:c.position.toArray(), rotation:c.quaternion.toArray()}))""")
+        for cloud in state_6718:
+            assert math.dist(cloud['position'], expected_6718[cloud['name']]) < 1e-9
+            assert math.dist(cloud['rotation'], [1,0,0,0]) < 1e-9
         page.wait_for_function('viewer.scene.pointclouds.some(c=>c.visible && c.numVisiblePoints>0)', timeout=45000)
         page.locator('#page-next').click()
-        assert page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).length') == 12
+        page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).length === 12', timeout=45000)
         page.wait_for_function('viewer.scene.pointclouds.reduce((n,c)=>n+c.numVisiblePoints,0)>0',timeout=45000)
         page.wait_for_timeout(1500)
         state = page.evaluate('''() => viewer.scene.pointclouds.filter(c=>c.name.startsWith("6719 / ")).map(c=>({name:c.name,position:c.position.toArray(),visible:c.visible,points:c.numVisiblePoints,size:c.material.size,adaptive:c.material.pointSizeType===Potree.PointSizeType.ADAPTIVE,circle:c.material.shape===Potree.PointShape.CIRCLE}))''')
@@ -48,11 +55,13 @@ with sync_playwright() as p:
         assert page.locator('#viewer-status').is_hidden()
         page.screenshot(path=f'/tmp/6719-{width}.png',full_page=True)
         page.locator('#page-next').click()
-        assert 'GPBK6720' in page.locator('#viewer-status').inner_text()
+        page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).length === 5', timeout=45000)
+        page.locator('#page-next').click()
+        assert 'GPBK6721' in page.locator('#viewer-status').inner_text()
         assert page.evaluate('viewer.scene.pointclouds.every(c=>!c.visible)')
         page.locator('#page-previous').click()
         page.go_back()
-        assert 'GPBK6720' in page.locator('#page-indicator').inner_text()
+        assert 'GPBK6721' in page.locator('#page-indicator').inner_text()
         page.locator('#page-previous').click()
         for person, count in (('1',3),('2',0),('3',0),('4',17),('1',3),('4',17)):
             page.locator('.menu-button').click()
@@ -69,7 +78,7 @@ with sync_playwright() as p:
                 assert names == ['6717 / 6717.11', '6717 / 6717.12', '6717 / 6717.2']
             if person == '4':
                 assert all(n.startswith('6735 / ') for n in names)
-        assert page.evaluate('viewer.scene.pointclouds.length') == 39
+        assert page.evaluate('viewer.scene.pointclouds.length') == 44
         assert not errors and not failures,(errors,failures)
         print(f'PASS: {width}px, 12 segments in one viewer, original origins preserved; 1/2/3/4 switching without duplicates',flush=True)
         print('Rendered segment points:', {c['name']:c['points'] for c in state},flush=True)

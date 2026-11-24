@@ -19,6 +19,7 @@
     },
     {
       "code": "GPBK6718",
+      "rotationXDegrees": 180,
       "sources": [
         {
           "url": "pointclouds/6718/static/6718.1_converted/cloud.js",
