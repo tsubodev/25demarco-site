@@ -4,11 +4,11 @@ from pathlib import Path
 from prepare_point_cloud import prepare
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / 'pointclouds/6735'
+BASE = ROOT / 'pointclouds/puxador-4/6735'
 
 if __name__ == '__main__':
     total = 0
-    sources = sorted(BASE.glob('*/metadata.json'))
+    sources = sorted((BASE / 'original').glob('*/metadata.json'))
     if not sources:
         raise ValueError('No 6735 source segments found')
     for metadata in sources:

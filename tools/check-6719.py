@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--url', default='http://127.0.0.1:8000/')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
-metadata = sorted((root / 'pointclouds/6719/original').glob('*/metadata.json'))
+metadata = sorted((root / 'pointclouds/puxador-1/6719/original').glob('*/metadata.json'))
 expected = {'6719 / ' + p.parent.name.removesuffix('_converted'): json.loads(p.read_text()) for p in metadata}
 assert len(expected) == 12
 with sync_playwright() as p:
@@ -26,14 +26,14 @@ with sync_playwright() as p:
         assert 'GPBK6717' in page.locator('#page-indicator').inner_text()
         expected_6717 = {f'6717 / {p.parent.name.removesuffix("_converted")}':
                          json.loads(p.read_text())['boundingBox']['min']
-                         for p in (root / 'pointclouds/6717/original').glob('*/metadata.json')}
+                         for p in (root / 'pointclouds/puxador-1/6717/original').glob('*/metadata.json')}
         assert len(expected_6717) == 3
         assert page.evaluate('Object.fromEntries(viewer.scene.pointclouds.filter(c=>c.visible).map(c=>[c.name,c.position.toArray()]))') == expected_6717
         page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).every(c=>c.numVisiblePoints>0)', timeout=45000)
         page.locator('#page-next').click()
         page.wait_for_function('viewer.scene.pointclouds.filter(c=>c.visible).length === 7', timeout=45000)
         expected_6718 = {}
-        for path in (root / 'pointclouds/6718/original').glob('*/metadata.json'):
+        for path in (root / 'pointclouds/puxador-1/6718/original').glob('*/metadata.json'):
             x, y, z = json.loads(path.read_text())['boundingBox']['min']
             expected_6718[f'6718 / {path.parent.name.removesuffix("_converted")}'] = [x, -y, -z]
         assert len(expected_6718) == 7

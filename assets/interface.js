@@ -3,7 +3,7 @@ import { tiagoMoments } from './tiago-moments.js';
 import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
 import { peopleContent } from './people.js';
-import { pointClouds as routes } from './point-clouds.js?v=fusion-1-6718-x180';
+import { pointClouds as routes } from './point-clouds.js?v=fusion-1-pastas-puxadores';
 
 const menuButton = document.querySelector('.menu-button');
 const startMenu = document.querySelector('#start-menu');

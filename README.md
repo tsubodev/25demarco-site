@@ -2,7 +2,7 @@
 
 Instalação estática do [Potree oficial](https://github.com/potree/potree), tag `1.8.2`, commit `3013577379b5c8530ebca3cdc980f7585ae2320f`.
 
-`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base. Os conjuntos da planilha ficam em `pointclouds/`, organizados por código.
+`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base. Os conjuntos da planilha ficam em `pointclouds/`, organizados por puxador e código.
 
 ## Executar
 
@@ -51,39 +51,39 @@ O catálogo [Fusion 1](assets/cloud-catalog.json) registra a ordem das colunas d
 | 3 · Thiago | — | GPBK6732 |
 | 4 · Benny (Benne no site) | GPBK6735 (17 trechos) | GPBK6733, GPBK6734, GPBK6736 |
 
-Ao importar uma nuvem, prepare a cópia estática em uma pasta própria e preencha `sources` no item correspondente com objetos `{ "url": "pointclouds/.../cloud.js", "name": "..." }`. O caminho deve apontar para um descritor existente. O empacotamento inclui as pastas desses descritores. Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
+Ao importar uma nuvem, use `pointclouds/puxador-<número>/<código>/original/` para os arquivos recebidos e `pointclouds/puxador-<número>/<código>/static/` para a cópia de exibição. Preencha `sources` no item correspondente com objetos `{ "url": "pointclouds/.../cloud.js", "name": "..." }`. O caminho deve apontar para um descritor existente. O empacotamento inclui as pastas desses descritores. Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
 
 Para preparar novos datasets no mesmo formato estático, preservando os originais:
 
 ```sh
-python3 tools/prepare_point_cloud.py pointclouds/6718/original/6718.1_converted pointclouds/6718/static/6718.1_converted
+python3 tools/prepare_point_cloud.py pointclouds/puxador-1/6718/original/6718.1_converted pointclouds/puxador-1/6718/static/6718.1_converted
 ```
 
 As configurações ADAPTIVE, CIRCLE, 0.25 e EDL desligado se aplicam a todos os percursos. As nuvens são carregadas sob demanda e mantidas em cache; retornar a uma página não duplica seu point cloud. O enquadramento usa apenas o percurso selecionado.
 
 ## Conjunto 6717
 
-Os três trechos da GPBK6717 ficam em `pointclouds/6717/original/`, com cópias para exibição em `pointclouds/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. A barra **Anterior / Próxima** permite alternar entre os conjuntos de Guilherme no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
+Os três trechos da GPBK6717 ficam em `pointclouds/puxador-1/6717/original/`, com cópias para exibição em `pointclouds/puxador-1/6717/static/`. São 3.710.770 pontos. O Puxador 1 abre com a 6717 e seus três trechos juntos. A barra **Anterior / Próxima** permite alternar entre os conjuntos de Guilherme no mesmo visualizador, exibindo um conjunto por vez. As coordenadas de cada arquivo são preservadas.
 
 Para regenerar as cópias estáticas:
 
 ```sh
 for segment in 6717.11_converted 6717.12_converted 6717.2_converted; do
-  python3 tools/prepare_point_cloud.py "pointclouds/6717/original/$segment" "pointclouds/6717/static/$segment"
+  python3 tools/prepare_point_cloud.py "pointclouds/puxador-1/6717/original/$segment" "pointclouds/puxador-1/6717/static/$segment"
 done
 ```
 
 ## Conjunto 6718
 
-A GPBK6718 é composta por sete trechos e soma 5.790.014 pontos. Os originais ficam em `pointclouds/6718/original/`, e as cópias para exibição, em `pointclouds/6718/static/`. Na segunda etapa de Guilherme, os sete trechos são exibidos juntos no Puxador 1.
+A GPBK6718 é composta por sete trechos e soma 5.790.014 pontos. Os originais ficam em `pointclouds/puxador-1/6718/original/`, e as cópias para exibição, em `pointclouds/puxador-1/6718/static/`. Na segunda etapa de Guilherme, os sete trechos são exibidos juntos no Puxador 1.
 
 ## Conjuntos 6720, 6722 e 6723
 
-As etapas 4, 6 e 7 de Guilherme exibem a GPBK6720, a GPBK6722 e a GPBK6723, respectivamente. Os originais ficam em `pointclouds/<código>/original/`, e as cópias para exibição, em `pointclouds/<código>/static/`. Os 23 trechos mantêm suas coordenadas de origem.
+As etapas 4, 6 e 7 de Guilherme exibem a GPBK6720, a GPBK6722 e a GPBK6723, respectivamente. Os originais ficam em `pointclouds/puxador-1/<código>/original/`, e as cópias para exibição, em `pointclouds/puxador-1/<código>/static/`. Os 23 trechos mantêm suas coordenadas de origem.
 
 ## Conjunto 6719
 
-Os 12 diretórios recebidos foram movidos de `6719/` para `pointclouds/6719/original/`, sem editar seu conteúdo. A cópia para exibição fica em `pointclouds/6719/static/`; são **11.321.028 pontos** no total.
+Os 12 diretórios recebidos foram movidos de `6719/` para `pointclouds/puxador-1/6719/original/`, sem editar seu conteúdo. A cópia para exibição fica em `pointclouds/puxador-1/6719/static/`; são **11.321.028 pontos** no total.
 
 Todos os trechos são carregados juntos no PUXADOR 1 (Guilherme) quando a GPBK6719 está selecionada no visualizador Potree. As coordenadas e os offsets de origem de cada trecho são preservados; não há translação dos point clouds para zero, troca de eixos ou mudança de escala. O enquadramento existente considera o conjunto selecionado, sem alterar a origem dos dados.
 
@@ -98,7 +98,7 @@ python3 tools/check-6719.py --url http://127.0.0.1:8000/
 
 ## Conjunto 6735
 
-O PUXADOR 4 carrega os 17 trechos da 6735 juntos. Os originais e `6735 cam.xml` permanecem em `pointclouds/6735/`; as cópias de exibição ficam em `pointclouds/6735/static/`. São **8.012.558 pontos**. Cada trecho preserva as coordenadas, os offsets e a origem recebidos, sem translação para zero, troca de eixos ou mudança de escala. O XML é a fonte da trajetória descrita abaixo.
+O PUXADOR 4 carrega os 17 trechos da 6735 juntos. Os originais e `6735 cam.xml` ficam em `pointclouds/puxador-4/6735/original/`. As cópias de exibição ficam em `pointclouds/puxador-4/6735/static/`. São **8.012.558 pontos**. Cada trecho preserva as coordenadas, os offsets e a origem recebidos, sem translação para zero, troca de eixos ou mudança de escala. O XML é a fonte da trajetória descrita abaixo.
 
 Para reproduzir e verificar:
 
@@ -111,7 +111,7 @@ O preparador verifica todos os pontos e limita o erro de quantização a 0,00000
 
 ## Dados de referência da 6735
 
-O XML original em `pointclouds/6735/6735 cam.xml` contém 240 posições de câmera. O script `tools/prepare-6735-trajectory.py` permite extrair essas posições para análise. Na etapa 3 de Benne, o site oferece exploração livre da nuvem.
+O XML original em `pointclouds/puxador-4/6735/original/6735 cam.xml` contém 240 posições de câmera. O script `tools/prepare-6735-trajectory.py` permite extrair essas posições para análise. Na etapa 3 de Benne, o site oferece exploração livre da nuvem.
 
 ## Rotação de exibição — 6735
 

@@ -8,7 +8,7 @@ import statistics
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'pointclouds/6735/6735 cam.xml'
+SOURCE = ROOT / 'pointclouds/puxador-4/6735/original/6735 cam.xml'
 TARGET = ROOT / 'assets/6735-trajectory.json'
 
 
@@ -39,7 +39,7 @@ def extract():
         raise ValueError('Possible recording interruption: split/review the path before publishing')
     if min(steps) == 0:
         raise ValueError('Repeated camera centres: review duplicate panoramas')
-    boxes = [json.loads(p.read_text())['boundingBox'] for p in (ROOT / 'pointclouds/6735').glob('*/metadata.json')]
+    boxes = [json.loads(p.read_text())['boundingBox'] for p in SOURCE.parent.glob('*/metadata.json')]
     for frame in frames:
         if not any(all(b['min'][i] <= frame['position'][i] <= b['max'][i] for i in range(3)) for b in boxes):
             raise ValueError(f'Camera outside the existing cloud bounds: {frame["id"]}')

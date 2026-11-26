@@ -94,7 +94,7 @@ with sync_playwright() as p:
 
     # A missing descriptor for one dataset must leave other stages usable.
     isolated = browser.new_page(viewport={'width': 1450, 'height': 1024})
-    affected_url = '**/pointclouds/6718/static/6718.1_converted/cloud.js'
+    affected_url = '**/pointclouds/puxador-1/6718/static/6718.1_converted/cloud.js'
     isolate_failure = lambda route: route.fulfill(status=404, body='Missing descriptor')
     isolated.route(affected_url, isolate_failure)
     isolated.goto(args.url + '#puxador-1/pagina-1')

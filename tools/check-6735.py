@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--url', default='http://127.0.0.1:8000/')
 args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
-metadata = sorted((root / 'pointclouds/6735').glob('*/metadata.json'))
+metadata = sorted((root / 'pointclouds/puxador-4/6735/original').glob('*/metadata.json'))
 expected = {'6735 / ' + p.parent.name.removesuffix(' - Cloud_converted'): json.loads(p.read_text()) for p in metadata}
 assert len(expected) == 17
 with sync_playwright() as p:

@@ -8,7 +8,7 @@
     "gapThreshold": 5,
     "totalDistance": 270.1318219730706
   },
-  "source": "pointclouds/6735/6735 cam.xml",
+  "source": "pointclouds/puxador-4/6735/original/6735 cam.xml",
   "sourceSha256": "a69b782ee7021d0bf0ae276eb0ef3efae0d6e1f8146f6c04bd0acbfc4b80eaf3",
   "coordinateSystem": "6735 existing local coordinates (metres)",
   "cameraToCloud": [

@@ -4,7 +4,7 @@ from pathlib import Path
 from prepare_point_cloud import prepare
 
 ROOT = Path(__file__).resolve().parents[1]
-BASE = ROOT / 'pointclouds/6719'
+BASE = ROOT / 'pointclouds/puxador-1/6719'
 
 if __name__ == '__main__':
     total = 0
