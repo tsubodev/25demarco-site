@@ -3,7 +3,7 @@ import { tiagoMoments } from './tiago-moments.js';
 import { installWheelInput } from './wheel-input.js';
 import { routePages } from './route-pages.js';
 import { peopleContent } from './people.js';
-import { pointClouds as routes } from './point-clouds.js?v=fusion-1-pastas-puxadores';
+import { pointClouds as routes } from './point-clouds.js?v=fusion-1-novas-nuvens';
 
 const menuButton = document.querySelector('.menu-button');
 const startMenu = document.querySelector('#start-menu');
@@ -259,11 +259,9 @@ function loadViewer(dataset) {
       await ensureViewer();
       const transform = displayTransformFor(dataset);
       const pointclouds = await Promise.all(sources.map(async source => {
-        const response = await fetch(source.url);
-        if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
         let timeout;
-        const { pointcloud } = await Promise.race([
-          Potree.loadPointCloud(source.url, source.name),
+        const pointcloud = await Promise.race([
+          loadCloudSegment(dataset, source),
           new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('Tempo de carregamento excedido')), 45000); }),
         ]).finally(() => clearTimeout(timeout));
         pointcloud.name = source.name;
@@ -293,6 +291,20 @@ function loadViewer(dataset) {
     }
   })();
   return record.promise;
+}
+
+async function loadCloudSegment(dataset, source) {
+  if (dataset.rawBase) {
+    const segmentPath = source.url.split('/').slice(-2).map(encodeURIComponent).join('/');
+    const url = new URL(segmentPath, dataset.rawBase).href;
+    const { geometry } = await Potree.OctreeLoader.load(url);
+    return new Potree.PointCloudOctree(geometry);
+  }
+
+  const response = await fetch(source.url);
+  if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
+  const { pointcloud } = await Potree.loadPointCloud(source.url, source.name);
+  return pointcloud;
 }
 
 people.forEach(button => button.addEventListener('click', () => {

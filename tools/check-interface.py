@@ -83,20 +83,17 @@ with sync_playwright() as p:
   page.locator('[data-person="1"]').click()
   page.wait_for_function('viewer.scene.pointclouds[0].visible && viewer.scene.pointclouds[0].numVisiblePoints > 0')
   assert page.locator('#viewer-status').is_hidden()
-  for person, code in (('2','GPBK627'),('3','GPBK6732'),('1',None)):
+  for person, code, count in (('2','6727',11),('3','6732',5),('1','6717',3)):
    page.locator('.menu-button').click()
    page.locator(f'[data-person="{person}"]').click()
+   page.wait_for_function('(n)=>viewer.scene.pointclouds.filter(c=>c.visible).length===n',arg=count,timeout=45000)
    visible = page.evaluate('viewer.scene.pointclouds.filter(c=>c.visible).map(c=>c.name)')
-   if code:
-    assert visible == []
-    assert code in page.locator('#viewer-status').inner_text()
+   assert all(name.startswith(f'{code} / ') for name in visible)
+   assert page.locator('#viewer-status').is_hidden()
+   if person != '1':
     assert page.locator('#tiago-moments').is_hidden()
-   else:
-    assert len(visible) == 3
-    assert all(name.startswith('6717 / ') for name in visible)
-    assert page.locator('#viewer-status').is_hidden()
-   assert page.evaluate('viewer.scene.pointclouds.length') == 20
-  print('PASS: Fusion 1 assignments, pending routes and cached clouds',width,flush=True)
+  assert page.evaluate('viewer.scene.pointclouds.length') == 36
+  print('PASS: Fusion 1 assignments and cached clouds',width,flush=True)
   page.keyboard.press('Escape');assert page.locator('#start-menu').is_visible()
   page.keyboard.press('Escape');assert not page.locator('#start-menu').is_visible()
   assert not errors and not failed,(errors,failed)

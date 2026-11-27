@@ -2,7 +2,7 @@
 
 Instalação estática do [Potree oficial](https://github.com/potree/potree), tag `1.8.2`, commit `3013577379b5c8530ebca3cdc980f7585ae2320f`.
 
-`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build sem alterações locais. `index.html` usa a integração do exemplo oficial como base. Os conjuntos da planilha ficam em `pointclouds/`, organizados por puxador e código.
+`vendor/potree-1.8.2/` contém as bibliotecas oficiais e o build do Potree. O carregador Potree 2.0 usa apenas o cabeçalho `Range` para que os binários possam ser lidos de outro domínio. `index.html` usa a integração do exemplo oficial como base. Os conjuntos da planilha ficam em `pointclouds/`, organizados por puxador e código.
 
 ## Executar
 
@@ -16,7 +16,7 @@ As cópias estáticas usam arquivos individuais e dispensam suporte a requisiç�
 
 ## Reproduzir os arquivos oficiais
 
-Clone `https://github.com/potree/potree` na tag `1.8.2` em uma pasta separada, execute `npm ci` e confirme os arquivos gerados em `build/potree/`. Copie `build/potree/`, `libs/` e `LICENSE` para a pasta versionada de `vendor/`. A integração usa a base do exemplo oficial, com uma interface própria em `assets/interface.css` e `assets/interface.js`. As bibliotecas oficiais não foram modificadas.
+Clone `https://github.com/potree/potree` na tag `1.8.2` em uma pasta separada, execute `npm ci` e confirme os arquivos gerados em `build/potree/`. Copie `build/potree/`, `libs/` e `LICENSE` para a pasta versionada de `vendor/`. Em `NodeLoader`, retire o cabeçalho `Content-Type` das duas requisições HTTP Range para `octree.bin` e `hierarchy.bin`. Calcule o diretório de `document.currentScript.src` com `new URL('.', document.currentScript.src)` para aceitar a versão de cache na URL. A integração usa a base do exemplo oficial, com uma interface própria em `assets/interface.css` e `assets/interface.js`.
 
 ## Publicação
 
@@ -46,12 +46,16 @@ O catálogo [Fusion 1](assets/cloud-catalog.json) registra a ordem das colunas d
 
 | Puxador | Disponíveis | Aguardando importação, na ordem da planilha |
 | --- | --- | --- |
-| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718 (7 trechos), GPBK6719 (12 trechos), GPBK6720 (5 trechos), GPBK6722 (7 trechos), GPBK6723 (11 trechos) | GPBK6721, GPBK6724 a GPBK6726 |
-| 2 · Emily | — | GPBK627, GPBK6728, GPBK6729, GB016730, GPBK6730 |
-| 3 · Thiago | — | GPBK6732 |
-| 4 · Benny (Benne no site) | GPBK6735 (17 trechos) | GPBK6733, GPBK6734, GPBK6736 |
+| 1 · Guilherme | GPBK6717 (3 trechos), GPBK6718 (7), GPBK6719 (12), GPBK6720 (5), GPBK6722 (7), GPBK6723 (11), GPBK6724 (23), GPBK6725 (25) | GPBK6721, GPBK6726 |
+| 2 · Emily | GPBK6727 (11 trechos), GPBK6728 (6), GPBK6729 (5) | GB016730, GPBK6730 |
+| 3 · Thiago | GPBK6732 (5 trechos) | — |
+| 4 · Benny (Benne no site) | GPBK6735 (17 trechos), GPBK6736 (25) | GPBK6733, GPBK6734 |
 
-Ao importar uma nuvem, use `pointclouds/puxador-<número>/<código>/original/` para os arquivos recebidos e `pointclouds/puxador-<número>/<código>/static/` para a cópia de exibição. Preencha `sources` no item correspondente com objetos `{ "url": "pointclouds/.../cloud.js", "name": "..." }`. O caminho deve apontar para um descritor existente. O empacotamento inclui as pastas desses descritores. Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
+Ao importar uma nuvem, use `pointclouds/puxador-<número>/<código>/original/` para os arquivos recebidos. Para uma cópia de exibição hospedada no Pages, use `static/` no mesmo conjunto e cadastre o `cloud.js` de cada segmento em `sources` com os campos `url` e `name`. O empacotamento inclui as pastas desses descritores.
+
+Para os conjuntos Potree 2.0 carregados diretamente do GitHub, cadastre em `sources` os caminhos locais dos `metadata.json` e adicione `rawBase` ao conjunto. Essa URL deve apontar para o diretório que contém os mesmos segmentos em um commit fixo do repositório, com barra final. O navegador solicita apenas os intervalos de bytes necessários, e o empacotamento do Pages deixa esses binários no GitHub. A primeira etapa de Emily usa o código GPBK6727, conforme o nome dos arquivos recebidos.
+
+Se faltar uma nuvem, a página continua acessível com texto, mapa e fotos. Os momentos de Thiago foram calibrados na 6719 e precisarão de novas posições para a GPBK6732.
 
 Para preparar novos datasets no mesmo formato estático, preservando os originais:
 

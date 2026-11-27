@@ -215,10 +215,208 @@
       ]
     },
     {
-      "code": "GPBK6724"
+      "code": "GPBK6724",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6724/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.1_converted/metadata.json",
+          "name": "6724 / 6724.1"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.2_converted/metadata.json",
+          "name": "6724 / 6724.2"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.3_converted/metadata.json",
+          "name": "6724 / 6724.3"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.4_converted/metadata.json",
+          "name": "6724 / 6724.4"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.5_converted/metadata.json",
+          "name": "6724 / 6724.5"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.6_converted/metadata.json",
+          "name": "6724 / 6724.6"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.7_converted/metadata.json",
+          "name": "6724 / 6724.7"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.8_converted/metadata.json",
+          "name": "6724 / 6724.8"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.9_converted/metadata.json",
+          "name": "6724 / 6724.9"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.10_converted/metadata.json",
+          "name": "6724 / 6724.10"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.11_converted/metadata.json",
+          "name": "6724 / 6724.11"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.12_converted/metadata.json",
+          "name": "6724 / 6724.12"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.13_converted/metadata.json",
+          "name": "6724 / 6724.13"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.14_converted/metadata.json",
+          "name": "6724 / 6724.14"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.15_converted/metadata.json",
+          "name": "6724 / 6724.15"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.16_converted/metadata.json",
+          "name": "6724 / 6724.16"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.17_converted/metadata.json",
+          "name": "6724 / 6724.17"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.18_converted/metadata.json",
+          "name": "6724 / 6724.18"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.19_converted/metadata.json",
+          "name": "6724 / 6724.19"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.20_converted/metadata.json",
+          "name": "6724 / 6724.20"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.21_converted/metadata.json",
+          "name": "6724 / 6724.21"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.22_converted/metadata.json",
+          "name": "6724 / 6724.22"
+        },
+        {
+          "url": "pointclouds/puxador-1/6724/original/6724.23_converted/metadata.json",
+          "name": "6724 / 6724.23"
+        }
+      ]
     },
     {
-      "code": "GPBK6725"
+      "code": "GPBK6725",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6725/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.1_converted/metadata.json",
+          "name": "6725 / 6725.1"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.2_converted/metadata.json",
+          "name": "6725 / 6725.2"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.3_converted/metadata.json",
+          "name": "6725 / 6725.3"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.4_converted/metadata.json",
+          "name": "6725 / 6725.4"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.5_converted/metadata.json",
+          "name": "6725 / 6725.5"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.6_converted/metadata.json",
+          "name": "6725 / 6725.6"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.7_converted/metadata.json",
+          "name": "6725 / 6725.7"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.8_converted/metadata.json",
+          "name": "6725 / 6725.8"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.9_converted/metadata.json",
+          "name": "6725 / 6725.9"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.10_converted/metadata.json",
+          "name": "6725 / 6725.10"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.11_converted/metadata.json",
+          "name": "6725 / 6725.11"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.12_converted/metadata.json",
+          "name": "6725 / 6725.12"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.13_converted/metadata.json",
+          "name": "6725 / 6725.13"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.14_converted/metadata.json",
+          "name": "6725 / 6725.14"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.15_converted/metadata.json",
+          "name": "6725 / 6725.15"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.16_converted/metadata.json",
+          "name": "6725 / 6725.16"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.17_converted/metadata.json",
+          "name": "6725 / 6725.17"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.18_converted/metadata.json",
+          "name": "6725 / 6725.18"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.19_converted/metadata.json",
+          "name": "6725 / 6725.19"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.20_converted/metadata.json",
+          "name": "6725 / 6725.20"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.21_converted/metadata.json",
+          "name": "6725 / 6725.21"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.22_converted/metadata.json",
+          "name": "6725 / 6725.22"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.23_converted/metadata.json",
+          "name": "6725 / 6725.23"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.24_converted/metadata.json",
+          "name": "6725 / 6725.24"
+        },
+        {
+          "url": "pointclouds/puxador-1/6725/original/6725.25_converted/metadata.json",
+          "name": "6725 / 6725.25"
+        }
+      ]
     },
     {
       "code": "GPBK6726"
@@ -226,13 +424,110 @@
   ],
   "2": [
     {
-      "code": "GPBK627"
+      "code": "GPBK6727",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6727/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.1_converted/metadata.json",
+          "name": "6727 / 6727.1"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.2_converted/metadata.json",
+          "name": "6727 / 6727.2"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.3_converted/metadata.json",
+          "name": "6727 / 6727.3"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.4_converted/metadata.json",
+          "name": "6727 / 6727.4"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.5_converted/metadata.json",
+          "name": "6727 / 6727.5"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.6_converted/metadata.json",
+          "name": "6727 / 6727.6"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.7_converted/metadata.json",
+          "name": "6727 / 6727.7"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.8_converted/metadata.json",
+          "name": "6727 / 6727.8"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.9_converted/metadata.json",
+          "name": "6727 / 6727.9"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.10_converted/metadata.json",
+          "name": "6727 / 6727.10"
+        },
+        {
+          "url": "pointclouds/puxador-2/6727/original/6727.11_converted/metadata.json",
+          "name": "6727 / 6727.11"
+        }
+      ]
     },
     {
-      "code": "GPBK6728"
+      "code": "GPBK6728",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6728/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-2/6728/original/6728.1_converted/metadata.json",
+          "name": "6728 / 6728.1"
+        },
+        {
+          "url": "pointclouds/puxador-2/6728/original/6728.2_converted/metadata.json",
+          "name": "6728 / 6728.2"
+        },
+        {
+          "url": "pointclouds/puxador-2/6728/original/6728.3_converted/metadata.json",
+          "name": "6728 / 6728.3"
+        },
+        {
+          "url": "pointclouds/puxador-2/6728/original/6728.4_converted/metadata.json",
+          "name": "6728 / 6728.4"
+        },
+        {
+          "url": "pointclouds/puxador-2/6728/original/6728.5_converted/metadata.json",
+          "name": "6728 / 6728.5"
+        },
+        {
+          "url": "pointclouds/puxador-2/6728/original/6728.6_converted/metadata.json",
+          "name": "6728 / 6728.6"
+        }
+      ]
     },
     {
-      "code": "GPBK6729"
+      "code": "GPBK6729",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6729/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-2/6729/original/6729.1_converted/metadata.json",
+          "name": "6729 / 6729.1"
+        },
+        {
+          "url": "pointclouds/puxador-2/6729/original/6729.2_converted/metadata.json",
+          "name": "6729 / 6729.2"
+        },
+        {
+          "url": "pointclouds/puxador-2/6729/original/6729.3_converted/metadata.json",
+          "name": "6729 / 6729.3"
+        },
+        {
+          "url": "pointclouds/puxador-2/6729/original/6729.4_converted/metadata.json",
+          "name": "6729 / 6729.4"
+        },
+        {
+          "url": "pointclouds/puxador-2/6729/original/6729.5_converted/metadata.json",
+          "name": "6729 / 6729.5"
+        }
+      ]
     },
     {
       "code": "GB016730"
@@ -243,7 +538,30 @@
   ],
   "3": [
     {
-      "code": "GPBK6732"
+      "code": "GPBK6732",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6732/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-3/6732/original/6732.1_converted/metadata.json",
+          "name": "6732 / 6732.1"
+        },
+        {
+          "url": "pointclouds/puxador-3/6732/original/6732.2_converted/metadata.json",
+          "name": "6732 / 6732.2"
+        },
+        {
+          "url": "pointclouds/puxador-3/6732/original/6732.3_converted/metadata.json",
+          "name": "6732 / 6732.3"
+        },
+        {
+          "url": "pointclouds/puxador-3/6732/original/6732.4_converted/metadata.json",
+          "name": "6732 / 6732.4"
+        },
+        {
+          "url": "pointclouds/puxador-3/6732/original/6732.5_converted/metadata.json",
+          "name": "6732 / 6732.5"
+        }
+      ]
     }
   ],
   "4": [
@@ -330,7 +648,110 @@
       ]
     },
     {
-      "code": "GPBK6736"
+      "code": "GPBK6736",
+      "rawBase": "https://raw.githubusercontent.com/tsubodev/25demarco-site/2f72523cac299973892675716f1ba76869b2372f/pointclouds/6736/",
+      "sources": [
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.1_converted/metadata.json",
+          "name": "6736 / 6736.1"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.2_converted/metadata.json",
+          "name": "6736 / 6736.2"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.3_converted/metadata.json",
+          "name": "6736 / 6736.3"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.4_converted/metadata.json",
+          "name": "6736 / 6736.4"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.5_converted/metadata.json",
+          "name": "6736 / 6736.5"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.6_converted/metadata.json",
+          "name": "6736 / 6736.6"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.7_converted/metadata.json",
+          "name": "6736 / 6736.7"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.8_converted/metadata.json",
+          "name": "6736 / 6736.8"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.9_converted/metadata.json",
+          "name": "6736 / 6736.9"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.10_converted/metadata.json",
+          "name": "6736 / 6736.10"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.11.1_converted/metadata.json",
+          "name": "6736 / 6736.11.1"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.11.2_converted/metadata.json",
+          "name": "6736 / 6736.11.2"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.11.3_converted/metadata.json",
+          "name": "6736 / 6736.11.3"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.12_converted/metadata.json",
+          "name": "6736 / 6736.12"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.13_converted/metadata.json",
+          "name": "6736 / 6736.13"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.14_converted/metadata.json",
+          "name": "6736 / 6736.14"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.15_converted/metadata.json",
+          "name": "6736 / 6736.15"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.16_converted/metadata.json",
+          "name": "6736 / 6736.16"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.17_converted/metadata.json",
+          "name": "6736 / 6736.17"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.18_converted/metadata.json",
+          "name": "6736 / 6736.18"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.19_converted/metadata.json",
+          "name": "6736 / 6736.19"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.20_converted/metadata.json",
+          "name": "6736 / 6736.20"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.21_converted/metadata.json",
+          "name": "6736 / 6736.21"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.22_converted/metadata.json",
+          "name": "6736 / 6736.22"
+        },
+        {
+          "url": "pointclouds/puxador-4/6736/original/6736.23_converted/metadata.json",
+          "name": "6736 / 6736.23"
+        }
+      ]
     }
   ]
 }

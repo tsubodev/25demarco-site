@@ -18,7 +18,8 @@ def cloud_folders():
                     raise ValueError(f'Invalid cloud path: {path}')
                 if not (ROOT / path).is_file():
                     raise FileNotFoundError(ROOT / path)
-                folders.add(path.parent)
+                if not dataset.get('rawBase'):
+                    folders.add(path.parent)
     return sorted(folder for folder in folders if not any(parent in folders for parent in folder.parents))
 
 

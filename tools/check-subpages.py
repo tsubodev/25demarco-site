@@ -83,7 +83,8 @@ with sync_playwright() as p:
     expect(indicator).to_contain_text('GPBK6736 · 4 / 4')
     page.go_forward()
     expect(indicator).to_contain_text('GPBK6735 · 3 / 4')
-    assert page.evaluate('viewer.scene.pointclouds.length') == 62
+    expected_segments = sum(len(dataset.get('sources', [])) for datasets in catalog.values() for dataset in datasets)
+    assert page.evaluate('viewer.scene.pointclouds.length') == expected_segments
 
     direct = browser.new_page(viewport={'width': 1450, 'height': 1024})
     direct.goto(args.url + '#puxador-1/pagina-2')

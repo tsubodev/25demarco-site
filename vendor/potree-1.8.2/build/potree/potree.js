@@ -66351,7 +66351,6 @@ void main() {
 				}else {
 					let response = await fetch(urlOctree, {
 						headers: {
-							'content-type': 'multipart/byteranges',
 							'Range': `bytes=${first}-${last}`,
 						},
 					});
@@ -66555,7 +66554,6 @@ void main() {
 
 			let response = await fetch(hierarchyPath, {
 				headers: {
-					'content-type': 'multipart/byteranges',
 					'Range': `bytes=${first}-${last}`,
 				},
 			});
@@ -90383,7 +90381,7 @@ ENDSEC
 	exports.scriptPath = "";
 
 	if (document.currentScript && document.currentScript.src) {
-		exports.scriptPath = new URL(document.currentScript.src + '/..').href;
+		exports.scriptPath = new URL('.', document.currentScript.src).href;
 		if (exports.scriptPath.slice(-1) === '/') {
 			exports.scriptPath = exports.scriptPath.slice(0, -1);
 		}
